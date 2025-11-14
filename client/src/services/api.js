@@ -199,6 +199,86 @@ export const apiClient = {
     );
   },
 
+  async searchExternalGames({ query = '', page = 1 } = {}) {
+    return withMock(
+      () =>
+        api
+          .get('/external-games/search', { params: { query, page } })
+          .then((res) => res.data),
+      () => {
+        const keyword = query.trim().toLowerCase();
+        const filtered = mockState.games
+          .filter((game) => !keyword || game.title.toLowerCase().includes(keyword))
+          .slice(0, 10)
+          .map((game) => ({
+            id: game.id,
+            title: game.title,
+            released: game.releaseYear ? String(game.releaseYear) : 'Đang cập nhật',
+            rating: game.rating,
+            genres: [game.genre],
+            platforms: game.platform,
+            thumbnail: null,
+            metacritic: null,
+            description: game.description
+          }));
+
+        return {
+          source: 'mock',
+          total: filtered.length,
+          results: filtered
+        };
+      }
+    );
+  },
+
+  async fetchExternalGameDetails(gameId) {
+    return withMock(
+      () => api.get(`/external-games/${gameId}`).then((res) => res.data),
+      () => {
+        const found = mockState.games.find((game) => game.id === gameId);
+        if (!found) {
+          return {
+            source: 'mock',
+            id: gameId,
+            title: 'Không tìm thấy game trong dữ liệu mô phỏng',
+            description: 'Hãy thử gọi API RAWG khi đã cấu hình API key.',
+            genres: [],
+            platforms: [],
+            ratingsCount: null,
+            publishers: [],
+            developers: [],
+            tags: [],
+            stores: [],
+            thumbnail: null,
+            metacritic: null,
+            esrbRating: null,
+            website: null
+          };
+        }
+
+        return {
+          source: 'mock',
+          id: found.id,
+          title: found.title,
+          description: found.description,
+          released: found.releaseYear ? String(found.releaseYear) : undefined,
+          rating: found.rating,
+          ratingsCount: null,
+          genres: [found.genre],
+          platforms: found.platform,
+          publishers: [],
+          developers: [],
+          tags: found.tags || [],
+          stores: [],
+          thumbnail: null,
+          metacritic: null,
+          esrbRating: null,
+          website: null
+        };
+      }
+    );
+  },
+
   async compareGames(gameIds) {
     return withMock(
       () => api.post('/comparisons', { gameIds }).then((res) => res.data.comparison),

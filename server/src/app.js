@@ -8,6 +8,7 @@ import searchRoutes from './routes/searchRoutes.js';
 import comparisonRoutes from './routes/comparisonRoutes.js';
 import commentRoutes from './routes/commentRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import externalGameRoutes from './routes/externalGameRoutes.js';
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.get('/api/health', (_, res) => {
 
 app.use('/api/users', userRoutes);
 app.use('/api/games', gameRoutes);
+app.use('/api/external-games', externalGameRoutes);
 app.use('/api/recommendations', recommendationRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/api/comparisons', comparisonRoutes);
