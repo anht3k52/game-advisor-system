@@ -14,6 +14,7 @@ const translations = {
       games: 'Games',
       search: 'Advanced Search',
       compare: 'Compare',
+      chatbot: 'AI Advisor',
       admin: 'Admin',
       login: 'Login',
       loginFailed: 'Login failed',
@@ -25,6 +26,24 @@ const translations = {
       title: 'Featured articles',
       loading: 'Loading articles…',
       error: 'Unable to load articles'
+    },
+    chatbot: {
+      title: 'AI game advisor',
+      description:
+        'Chat with our Gemini-powered assistant to discover games tailored to your tastes.',
+      welcome:
+        'Hi! I’m your AI advisor. Tell me about the genres, mood, or platforms you enjoy and I’ll suggest games to match.',
+      promptLabel: 'Ask for recommendations',
+      inputPlaceholder:
+        'Describe what you feel like playing, favourite games, or requirements for the perfect match…',
+      send: 'Send message',
+      sending: 'Sending…',
+      typing: 'Advisor is thinking…',
+      error: 'Unable to contact the advisor right now. Please try again later.',
+      labels: {
+        ai: 'AI',
+        you: 'You'
+      }
     },
     articles: {
       relatedGame: 'Related game',
@@ -155,16 +174,15 @@ const translations = {
           update: 'Save changes',
           updating: 'Saving…',
           cancelEdit: 'Cancel edit',
-          submitting: 'Creating…'
-        },
+          submitting: 'Creating…',
+         
         errors: {
           load: 'Unable to load articles',
           create: 'Unable to create article',
           update: 'Unable to update article',
           delete: 'Unable to delete article',
           slugConflict: 'An article with that address already exists. Please adjust the title or slug.',
-          delete: 'Unable to delete article'
-        },
+          delete: 'Unable to delete article',
         confirmDelete: 'Delete this article?',
         table: {
           title: 'Title',
@@ -244,6 +262,7 @@ const translations = {
       games: 'Trò chơi',
       search: 'Tìm kiếm nâng cao',
       compare: 'So sánh',
+      chatbot: 'Trợ lý AI',
       admin: 'Quản trị',
       login: 'Đăng nhập',
       loginFailed: 'Đăng nhập thất bại',
@@ -255,6 +274,23 @@ const translations = {
       title: 'Bài viết nổi bật',
       loading: 'Đang tải bài viết…',
       error: 'Không thể tải bài viết'
+    },
+    chatbot: {
+      title: 'Trợ lý AI tư vấn game',
+      description: 'Trò chuyện với trợ lý Gemini để nhận gợi ý phù hợp với sở thích của bạn.',
+      welcome:
+        'Xin chào! Tôi là trợ lý AI tư vấn game. Hãy chia sẻ thể loại, tâm trạng hoặc nền tảng bạn yêu thích để tôi gợi ý nhé.',
+      promptLabel: 'Yêu cầu gợi ý',
+      inputPlaceholder:
+        'Hãy cho trợ lý biết bạn muốn chơi gì, tâm trạng, trò chơi yêu thích hoặc yêu cầu cụ thể…',
+      send: 'Gửi tin nhắn',
+      sending: 'Đang gửi…',
+      typing: 'Trợ lý đang suy nghĩ…',
+      error: 'Hiện không thể kết nối tới trợ lý. Vui lòng thử lại sau.',
+      labels: {
+        ai: 'AI',
+        you: 'Bạn'
+      }
     },
     articles: {
       relatedGame: 'Trò chơi liên quan',
