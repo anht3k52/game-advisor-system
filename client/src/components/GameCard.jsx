@@ -19,10 +19,8 @@ export default function GameCard({ game }) {
           <span className="game-id">{t('games.rawgId', { id: game.id })}</span>
           {ratingValue != null && <span>{t('games.rating', { rating: ratingValue })}</span>}
           {game.released && <span>{t('games.release', { date: game.released })}</span>}
-=======
-          <span className="game-id">RAWG ID: {game.id}</span>
-          <span>Rating: {game.rating?.toFixed ? game.rating.toFixed(1) : game.rating}</span>
-          {game.released && <span>Released: {game.released}</span>}
+
+
         </p>
         {game.genres && (
           <div className="tag-list">
