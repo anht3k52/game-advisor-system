@@ -1,5 +1,9 @@
 import { Router } from 'express'
-import { getRecommendationsForUser, getSimilarGames, getRecommendationsForPreferences } from '../services/recommendationService.js'
+import {
+  getRecommendationsForUser,
+  getSimilarGames,
+  getRecommendationsForPreferences
+} from '../services/recommendationService.js'
 
 const router = Router()
 

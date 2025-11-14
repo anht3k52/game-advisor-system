@@ -14,7 +14,7 @@ import {
   createReview,
   fetchAdminStats,
   fetchAdminActivity
-} from './api/client.js'
+} from './services/api.js'
 import UserManagement from './components/UserManagement.jsx'
 import GameManagement from './components/GameManagement.jsx'
 import RecommendationCenter from './components/RecommendationCenter.jsx'

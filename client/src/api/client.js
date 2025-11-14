@@ -94,3 +94,17 @@ export function fetchAdminStats () {
 export function fetchAdminActivity () {
   return request('/api/admin/activity')
 }
+
+export function fetchRawgTrending (params = {}) {
+  const query = new URLSearchParams(
+    Object.entries(params).reduce((acc, [key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        acc[key] = value
+      }
+      return acc
+    }, {})
+  )
+  const queryString = query.toString()
+  const suffix = queryString ? `?${queryString}` : ''
+  return request(`/api/games/external/trending${suffix}`)
+}

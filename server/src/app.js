@@ -2,7 +2,7 @@ import express from 'express'
 import cors from 'cors'
 import morgan from 'morgan'
 
-import usersRouter from './routes/users.js'
+import usersRouter from './routes/userRoutes.js'
 import gamesRouter from './routes/games.js'
 import recommendationsRouter from './routes/recommendations.js'
 import searchRouter from './routes/search.js'
