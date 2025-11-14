@@ -21,7 +21,6 @@ export default function AdminArticlesPage() {
   const [saving, setSaving] = useState(false);
   const [listLoading, setListLoading] = useState(true);
   const { t, language } = useLanguage();
-
   useEffect(() => {
     load();
   }, []);
@@ -122,14 +121,8 @@ export default function AdminArticlesPage() {
             onChange={handleChange}
             placeholder={t('admin.articles.form.shortDescriptionVi')}
           />
-          <textarea
-            name="content"
-            value={form.content}
-            onChange={handleChange}
-            placeholder={t('admin.articles.form.content')}
-            rows={6}
-            required
-          />
+
+          
           <textarea
             name="contentVi"
             value={form.contentVi}
@@ -199,6 +192,18 @@ export default function AdminArticlesPage() {
                     </tr>
                   );
                 })}
+                {articles.map((article) => (
+                  <tr key={article._id}>
+                    <td>{article.title}</td>
+                    <td>{(article.tags || []).join(', ')}</td>
+                    <td>{article.publishedAt ? new Date(article.publishedAt).toLocaleDateString() : '—'}</td>
+                    <td>
+                      <button type="button" onClick={() => handleDelete(article._id)} className="btn-link">
+                        {t('admin.articles.table.delete')}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
