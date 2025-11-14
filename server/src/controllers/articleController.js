@@ -14,7 +14,19 @@ export async function createArticle(req, res, next) {
   }
 
   try {
-    const { title, slug, thumbnailUrl, shortDescription, content, relatedGameId, tags, publishedAt } = req.body;
+    const {
+      title,
+      slug,
+      thumbnailUrl,
+      shortDescription,
+      shortDescriptionVi,
+      content,
+      contentVi,
+      titleVi,
+      relatedGameId,
+      tags,
+      publishedAt
+    } = req.body;
     const generatedSlug = slug
       ? slug.toLowerCase()
       : slugify(title, { lower: true, strict: true });
@@ -26,10 +38,13 @@ export async function createArticle(req, res, next) {
 
     const article = await Article.create({
       title,
+      titleVi,
       slug: generatedSlug,
       thumbnailUrl,
       shortDescription,
+      shortDescriptionVi,
       content,
+      contentVi,
       relatedGameId,
       author: req.user._id,
       tags,
@@ -113,7 +128,7 @@ export async function getArticleBySlug(req, res, next) {
       ]
     })
       .limit(6)
-      .select('title slug thumbnailUrl shortDescription publishedAt tags relatedGameId')
+      .select('title titleVi slug thumbnailUrl shortDescription shortDescriptionVi publishedAt tags relatedGameId')
       .lean();
 
     res.json({ article, relatedGame, relatedArticles });
@@ -130,7 +145,19 @@ export async function updateArticle(req, res, next) {
 
   try {
     const { id } = req.params;
-    const { title, slug, thumbnailUrl, shortDescription, content, relatedGameId, tags, publishedAt } = req.body;
+    const {
+      title,
+      titleVi,
+      slug,
+      thumbnailUrl,
+      shortDescription,
+      shortDescriptionVi,
+      content,
+      contentVi,
+      relatedGameId,
+      tags,
+      publishedAt
+    } = req.body;
 
     const article = await Article.findById(id);
     if (!article) {
@@ -139,9 +166,12 @@ export async function updateArticle(req, res, next) {
 
     if (title) article.title = title;
     if (slug) article.slug = slug.toLowerCase();
+    if (titleVi !== undefined) article.titleVi = titleVi;
     if (thumbnailUrl !== undefined) article.thumbnailUrl = thumbnailUrl;
     if (shortDescription !== undefined) article.shortDescription = shortDescription;
+    if (shortDescriptionVi !== undefined) article.shortDescriptionVi = shortDescriptionVi;
     if (content !== undefined) article.content = content;
+    if (contentVi !== undefined) article.contentVi = contentVi;
     if (relatedGameId !== undefined) article.relatedGameId = relatedGameId;
     if (tags !== undefined) article.tags = tags;
     if (publishedAt !== undefined) article.publishedAt = publishedAt;

@@ -22,8 +22,11 @@ router.post(
   roleMiddleware(['editor', 'admin']),
   [
     body('title').notEmpty(),
+    body('titleVi').optional().notEmpty(),
     body('shortDescription').notEmpty(),
-    body('content').notEmpty()
+    body('shortDescriptionVi').optional().notEmpty(),
+    body('content').notEmpty(),
+    body('contentVi').optional().notEmpty()
   ],
   createArticle
 );
@@ -32,7 +35,14 @@ router.put(
   '/:id',
   authMiddleware,
   roleMiddleware(['editor', 'admin']),
-  [body('title').optional().notEmpty()],
+  [
+    body('title').optional().notEmpty(),
+    body('titleVi').optional().notEmpty(),
+    body('shortDescription').optional().notEmpty(),
+    body('shortDescriptionVi').optional().notEmpty(),
+    body('content').optional().notEmpty(),
+    body('contentVi').optional().notEmpty()
+  ],
   updateArticle
 );
 

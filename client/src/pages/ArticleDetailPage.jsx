@@ -7,6 +7,7 @@ import { fetchArticle, markArticleAsRead } from '../services/articleApi.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import CommentSection from '../components/CommentSection.jsx';
 import GameCard from '../components/GameCard.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 export default function ArticleDetailPage() {
   const { slug } = useParams();
@@ -16,6 +17,7 @@ export default function ArticleDetailPage() {
   const [relatedArticles, setRelatedArticles] = useState([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+  const { t, language } = useLanguage();
 
   useEffect(() => {
     async function load() {
@@ -31,25 +33,26 @@ export default function ArticleDetailPage() {
         }
       } catch (err) {
         console.error(err);
-        setError('Unable to load article');
+        setError(t('articles.notFound'));
       } finally {
         setLoading(false);
       }
     }
 
     load();
-  }, [slug, user?._id]);
+  }, [slug, user?._id, t]);
 
   const html = useMemo(() => {
     if (!article) return '';
-    const rawHtml = marked.parse(article.content || '');
+    const content = language === 'vi' ? article.contentVi || article.content : article.content || article.contentVi;
+    const rawHtml = marked.parse(content || '');
     return DOMPurify.sanitize(rawHtml);
-  }, [article]);
+  }, [article, language]);
 
   if (loading) {
     return (
       <div className="page">
-        <p>Loading article…</p>
+        <p>{t('articles.loading')}</p>
       </div>
     );
   }
@@ -57,35 +60,37 @@ export default function ArticleDetailPage() {
   if (error || !article) {
     return (
       <div className="page">
-        <p className="error">{error || 'Article not found'}</p>
+        <p className="error">{error || t('articles.notFound')}</p>
       </div>
     );
   }
+
+  const title = language === 'vi' ? article.titleVi || article.title : article.title || article.titleVi;
 
   return (
     <div className="page article-detail">
       <article>
         <header className="article-header">
-          <h1>{article.title}</h1>
+          <h1>{title}</h1>
           <p className="article-meta">
-            {article.author?.fullName && <span>By {article.author.fullName}</span>}
+            {article.author?.fullName && <span>{t('articles.byAuthor', { author: article.author.fullName })}</span>}
             <span>{dayjs(article.publishedAt).format('DD/MM/YYYY')}</span>
           </p>
-          {article.thumbnailUrl && <img src={article.thumbnailUrl} alt={article.title} />}
+          {article.thumbnailUrl && <img src={article.thumbnailUrl} alt={title} />}
         </header>
         <div className="article-content" dangerouslySetInnerHTML={{ __html: html }} />
       </article>
 
       {relatedGame && (
         <section className="related-game">
-          <h2>Related game</h2>
+          <h2>{t('articles.relatedGame')}</h2>
           <GameCard game={relatedGame} />
         </section>
       )}
 
       {relatedArticles.length > 0 && (
         <section>
-          <h2>Related articles</h2>
+          <h2>{t('articles.relatedArticles')}</h2>
           <div className="article-grid">
             {relatedArticles.map((item) => (
               <ArticleSummary key={item._id || item.slug} article={item} />
@@ -100,12 +105,19 @@ export default function ArticleDetailPage() {
 }
 
 function ArticleSummary({ article }) {
+  const { language, t } = useLanguage();
+  const title = language === 'vi' ? article.titleVi || article.title : article.title || article.titleVi;
+  const description =
+    language === 'vi'
+      ? article.shortDescriptionVi || article.shortDescription
+      : article.shortDescription || article.shortDescriptionVi;
+
   return (
     <div className="article-summary">
-      <h3>{article.title}</h3>
-      <p>{article.shortDescription}</p>
+      <h3>{title}</h3>
+      <p>{description}</p>
       <Link to={`/articles/${article.slug}`} className="btn-link">
-        Read more
+        {t('articles.readMore')}
       </Link>
     </div>
   );
