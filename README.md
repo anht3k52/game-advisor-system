@@ -1,53 +1,34 @@
-# Hệ thống tư vấn game
+# Game Advisor System
 
-Giải pháp mẫu cho website "Hệ thống tư vấn game" với kiến trúc **React + Node.js**. Dự án bao gồm hai phần:
+Full-stack platform for managing curated game articles, user profiles, and live game metadata powered by the RAWG API. The project exposes an Express + MongoDB backend and a React front-end with JWT authentication, advanced search, comparison tools, and an admin dashboard.
 
-- **Backend (server/)**: API RESTful bằng Express quản lý người dùng, game, gợi ý thông minh, tìm kiếm nâng cao, so sánh, bình luận/đánh giá và bảng điều khiển quản trị.
-- **Frontend (client/)**: Ứng dụng React tiêu thụ các API, cung cấp giao diện quản lý và tư vấn game thời gian thực.
+## Prerequisites
 
-## Cấu trúc thư mục
+- Node.js 18+
+- npm
+- MongoDB instance (local or remote)
+- RAWG developer API key
 
-```
-.
-├── client/               # Ứng dụng React (Vite)
-│   ├── src/
-│   │   ├── App.jsx
-│   │   ├── main.jsx
-│   │   ├── styles.css
-│   │   └── components/
-│   │       ├── AdminPanel.jsx
-│   │       ├── AdvancedSearch.jsx
-│   │       ├── CommentModeration.jsx
-│   │       ├── GameComparison.jsx
-│   │       ├── GameManagement.jsx
-│   │       ├── RecommendationCenter.jsx
-│   │       └── UserManagement.jsx
-│   ├── index.html
-│   └── vite.config.js
-└── server/               # API Node.js + Express
-    ├── src/
-    │   ├── app.js
-    │   ├── index.js
-    │   ├── data/
-    │   │   ├── comments.js
-    │   │   ├── games.js
-    │   │   └── users.js
-    │   ├── routes/
-    │   │   ├── adminRoutes.js
-    │   │   ├── commentRoutes.js
-    │   │   ├── comparisonRoutes.js
-    │   │   ├── gameRoutes.js
-    │   │   ├── recommendationRoutes.js
-    │   │   ├── searchRoutes.js
-    │   │   └── userRoutes.js
-    │   └── services/
-    │       └── recommendationService.js
-    └── package.json
+## Environment variables
+
+Create `.env` files in both `server/` and `client/` (optional) folders. Backend requires:
+
+```bash
+# server/.env
+PORT=4000
+MONGODB_URI=mongodb://localhost:27017/game-advisor
+JWT_SECRET=super-secret-key
+RAWG_API_KEY=19e6fa0eebc84db38c33877a24f58726
 ```
 
-## Bắt đầu
+The React app reads API URL from `VITE_API_BASE_URL` (defaults to `/api`). Example:
 
-### 1. Chạy backend
+```bash
+# client/.env
+VITE_API_BASE_URL=/api
+```
+
+## Backend
 
 ```bash
 cd server
@@ -55,9 +36,16 @@ npm install
 npm run dev
 ```
 
-API mặc định chạy tại `http://localhost:4000` với các endpoint `/api/*`.
+The API listens on `http://localhost:4000`. Major route groups:
 
-### 2. Chạy frontend
+- `POST /api/auth/register`, `POST /api/auth/login`, `GET /api/auth/me`
+- `GET /api/articles`, `GET /api/articles/:slug`, editor/admin CRUD
+- RAWG proxy endpoints under `/api/games`
+- Recommendations `/api/recommend/games/:userId`
+- Comments and local ratings under `/api/comments` and `/api/ratings`
+- Admin panel under `/api/admin` (protected by JWT + role)
+
+## Frontend
 
 ```bash
 cd client
@@ -65,27 +53,51 @@ npm install
 npm run dev
 ```
 
-Ứng dụng React chạy ở `http://localhost:3000` và sử dụng proxy tới API.
+The Vite dev server starts on `http://localhost:3000` and proxies `/api` to the backend. Pages include:
 
-#### Mô phỏng giao diện mà không cần backend
+- Home with paginated game articles
+- Article detail with RAWG data, related posts, comments, and markdown rendering
+- Game explorer, game detail (with local ratings + comments), advanced search, comparison
+- Authentication (register/login) and user profile with favourites/history
+- Admin dashboard for managing users, articles, and comments
 
-Nếu bạn chỉ muốn khám phá giao diện mà chưa khởi chạy API, hãy bật biến môi trường `VITE_USE_MOCK` khi chạy Vite:
+## RAWG API usage
 
-```bash
-cd client
-VITE_USE_MOCK=true npm run dev
+All RAWG requests are proxied via the backend service located at `server/src/services/rawgService.js`. The proxy attaches `key=${process.env.RAWG_API_KEY}` automatically and applies a 10-minute in-memory cache to reduce API calls.
+
+## Scripts
+
+- `npm run dev` – hot-reload development server (backend or frontend depending on directory)
+- `npm run start` – production start command for the backend
+
+## Testing the stack
+
+1. Start MongoDB (e.g. `mongod` locally or Atlas cluster).
+2. Run the backend dev server (`npm run dev` inside `server/`).
+3. Launch the frontend dev server (`npm run dev` inside `client/`).
+4. Visit `http://localhost:3000` to interact with the Game Advisor UI.
+
+## Project structure
+
 ```
-
-Chế độ này tự động sử dụng dữ liệu demo (user, game, bình luận...) và hiển thị banner "Chế độ mô phỏng" ngay trên giao diện.
-
-## Các module chính
-
-- **Quản lý người dùng**: thêm/sửa/xóa người dùng và cấu hình sở thích.
-- **Quản lý game**: cập nhật kho game với thông tin chi tiết.
-- **Tư vấn game thông minh**: thuật toán chấm điểm dựa trên sở thích, nền tảng, ngân sách.
-- **Tìm kiếm nâng cao**: lọc game theo từ khóa, thể loại, giá, rating, tag.
-- **So sánh game**: so sánh nhanh nhiều tựa game.
-- **Bình luận – đánh giá**: quản lý phản hồi người chơi, hỗ trợ CRUD.
-- **Quản trị hệ thống**: thống kê tổng quan và gửi thông báo hệ thống.
-
-> Dự án sử dụng dữ liệu mẫu trong bộ nhớ để minh hoạ luồng chức năng. Khi triển khai thực tế có thể thay thế bằng database, cơ chế xác thực, AI model chuyên sâu…
+.
+├── client/         # React application (Vite)
+│   ├── src/
+│   │   ├── App.jsx
+│   │   ├── context/AuthContext.jsx
+│   │   ├── components/
+│   │   ├── pages/
+│   │   └── services/
+│   └── vite.config.js
+└── server/         # Express REST API
+    ├── src/
+    │   ├── app.js
+    │   ├── index.js
+    │   ├── config/
+    │   ├── controllers/
+    │   ├── middlewares/
+    │   ├── models/
+    │   ├── routes/
+    │   └── services/
+    └── package.json
+```

@@ -1,34 +1,33 @@
 import { Router } from 'express';
-import { users } from '../data/users.js';
-import { games } from '../data/games.js';
-import { comments } from '../data/comments.js';
+import { getDashboard, listUsers, updateUserRole } from '../controllers/adminController.js';
+import { getArticles, createArticle, updateArticle, deleteArticle } from '../controllers/articleController.js';
+import { moderateComment, listComments } from '../controllers/commentController.js';
+import { authMiddleware } from '../middlewares/authMiddleware.js';
+import { roleMiddleware } from '../middlewares/roleMiddleware.js';
+import { body } from 'express-validator';
 
 const router = Router();
 
-router.get('/metrics', (_req, res) => {
-  const avgRating =
-    comments.reduce((acc, comment) => acc + (comment.rating || 0), 0) /
-    Math.max(comments.length, 1);
+router.use(authMiddleware, roleMiddleware(['admin']));
 
-  res.json({
-    totalUsers: users.length,
-    totalGames: games.length,
-    totalComments: comments.length,
-    averageRating: Number(avgRating.toFixed(2)),
-    latestComments: comments
-      .slice()
-      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-      .slice(0, 5)
-  });
+router.get('/dashboard', getDashboard);
+
+router.get('/users', listUsers);
+router.patch('/users/:id', updateUserRole);
+
+router.get('/articles', getArticles);
+router.post(
+  '/articles',
+  [body('title').notEmpty(), body('shortDescription').notEmpty(), body('content').notEmpty()],
+  createArticle
+);
+router.put('/articles/:id', updateArticle);
+router.delete('/articles/:id', deleteArticle);
+
+router.get('/comments/:targetType/:targetId', (req, res, next) => {
+  req.query.includeHidden = 'true';
+  return listComments(req, res, next);
 });
-
-router.post('/broadcast', (req, res) => {
-  const { message } = req.body;
-  if (!message) {
-    return res.status(400).json({ error: 'Message is required' });
-  }
-
-  res.json({ status: 'sent', message });
-});
+router.patch('/comments/:id/moderate', moderateComment);
 
 export default router;
