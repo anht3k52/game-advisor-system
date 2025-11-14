@@ -16,7 +16,6 @@ export default function GameCard({ game }) {
           <Link to={`/games/${game.id}`}>{game.name}</Link>
         </h3>
         <p className="game-meta">
-codex/fix-login-and-registration-layout-zkbe15
           <span className="game-id">{t('games.rawgId', { id: game.id })}</span>
           {ratingValue != null && <span>{t('games.rating', { rating: ratingValue })}</span>}
           {game.released && <span>{t('games.release', { date: game.released })}</span>}
