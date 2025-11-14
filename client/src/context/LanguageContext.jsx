@@ -54,6 +54,25 @@ const translations = {
       byAuthor: 'By {{author}}',
       generic: 'Article'
     },
+    advancedSearch: {
+      title: 'Advanced search',
+      keyword: 'Search by title, genre, or tag…',
+      all: 'All content',
+      games: 'Games',
+      articles: 'Articles',
+      articleTags: 'Article tags (comma separated)',
+      gameGenres: 'Game genres (comma separated)',
+      platforms: 'Platforms (comma separated)',
+      year: 'Release year or range (e.g. 2020-2024)',
+      sort: 'Sort by',
+      sortRating: 'Rating (high to low)',
+      sortRelease: 'Release date (newest first)',
+      searchBtn: 'Search',
+      searching: 'Searching…',
+      articlesHeader: 'Articles',
+      gamesHeader: 'Games',
+      error: 'Unable to complete the search'
+    },
     recommendations: {
       title: 'Recommendations',
       loading: 'Loading suggestions…',
@@ -299,6 +318,25 @@ const translations = {
       notFound: 'Không tìm thấy bài viết',
       byAuthor: 'Tác giả {{author}}',
       generic: 'Bài viết'
+    },
+    advancedSearch: {
+      title: 'Tìm kiếm nâng cao',
+      keyword: 'Tìm theo tiêu đề, thể loại hoặc thẻ…',
+      all: 'Tất cả nội dung',
+      games: 'Trò chơi',
+      articles: 'Bài viết',
+      articleTags: 'Thẻ bài viết (ngăn cách bằng dấu phẩy)',
+      gameGenres: 'Thể loại trò chơi (ngăn cách bằng dấu phẩy)',
+      platforms: 'Nền tảng (ngăn cách bằng dấu phẩy)',
+      year: 'Năm phát hành hoặc khoảng (ví dụ 2020-2024)',
+      sort: 'Sắp xếp theo',
+      sortRating: 'Điểm đánh giá (cao đến thấp)',
+      sortRelease: 'Ngày phát hành (mới nhất)',
+      searchBtn: 'Tìm kiếm',
+      searching: 'Đang tìm kiếm…',
+      articlesHeader: 'Bài viết',
+      gamesHeader: 'Trò chơi',
+      error: 'Không thể hoàn tất tìm kiếm'
     },
     recommendations: {
       title: 'Gợi ý cho bạn',
