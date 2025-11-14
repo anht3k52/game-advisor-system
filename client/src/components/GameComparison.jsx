@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import { apiClient } from '../services/api.js';
 
 function GameComparison() {
   const [games, setGames] = useState([]);
@@ -7,7 +7,7 @@ function GameComparison() {
   const [comparison, setComparison] = useState([]);
 
   useEffect(() => {
-    axios.get('/api/games').then((res) => setGames(res.data));
+    apiClient.fetchGames().then(setGames);
   }, []);
 
   const toggleGame = (gameId) => {
@@ -18,8 +18,8 @@ function GameComparison() {
 
   const handleCompare = async () => {
     if (selected.length < 2) return;
-    const { data } = await axios.post('/api/comparisons', { gameIds: selected });
-    setComparison(data.comparison);
+    const data = await apiClient.compareGames(selected);
+    setComparison(data);
   };
 
   return (

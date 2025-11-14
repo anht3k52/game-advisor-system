@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import { apiClient } from '../services/api.js';
 
 const DEFAULT_PREFS = {
   favoriteGenres: 'RPG, Strategy',
@@ -31,8 +31,9 @@ function RecommendationCenter() {
     event.preventDefault();
     setLoading(true);
     try {
-      const { data } = await axios.post('/api/recommendations', buildPayload());
-      setRecommendations(data.recommendations);
+      const payload = buildPayload();
+      const result = await apiClient.recommend(payload.preferences);
+      setRecommendations(result);
     } finally {
       setLoading(false);
     }

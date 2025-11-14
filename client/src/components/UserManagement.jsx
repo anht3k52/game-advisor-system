@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import { apiClient } from '../services/api.js';
 
 const INITIAL_FORM = {
   name: '',
@@ -16,7 +16,7 @@ function UserManagement() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    axios.get('/api/users').then((res) => setUsers(res.data));
+    apiClient.fetchUsers().then(setUsers);
   }, []);
 
   const handleChange = (event) => {
@@ -39,8 +39,8 @@ function UserManagement() {
         }
       };
 
-      const { data } = await axios.post('/api/users', payload);
-      setUsers((prev) => [...prev, data]);
+      const created = await apiClient.createUser(payload);
+      setUsers((prev) => [...prev, created]);
       setForm(INITIAL_FORM);
     } finally {
       setLoading(false);

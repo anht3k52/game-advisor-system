@@ -67,6 +67,17 @@ npm run dev
 
 Ứng dụng React chạy ở `http://localhost:3000` và sử dụng proxy tới API.
 
+#### Mô phỏng giao diện mà không cần backend
+
+Nếu bạn chỉ muốn khám phá giao diện mà chưa khởi chạy API, hãy bật biến môi trường `VITE_USE_MOCK` khi chạy Vite:
+
+```bash
+cd client
+VITE_USE_MOCK=true npm run dev
+```
+
+Chế độ này tự động sử dụng dữ liệu demo (user, game, bình luận...) và hiển thị banner "Chế độ mô phỏng" ngay trên giao diện.
+
 ## Các module chính
 
 - **Quản lý người dùng**: thêm/sửa/xóa người dùng và cấu hình sở thích.

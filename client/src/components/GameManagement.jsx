@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import { apiClient } from '../services/api.js';
 
 const DEFAULT_FORM = {
   title: '',
@@ -15,7 +15,7 @@ function GameManagement() {
   const [form, setForm] = useState(DEFAULT_FORM);
 
   useEffect(() => {
-    axios.get('/api/games').then((res) => setGames(res.data));
+    apiClient.fetchGames().then(setGames);
   }, []);
 
   const handleChange = (event) => {
@@ -34,8 +34,8 @@ function GameManagement() {
       platform: form.platform.split(',').map((platform) => platform.trim()).filter(Boolean)
     };
 
-    const { data } = await axios.post('/api/games', payload);
-    setGames((prev) => [...prev, data]);
+    const created = await apiClient.createGame(payload);
+    setGames((prev) => [...prev, created]);
     setForm(DEFAULT_FORM);
   };
 

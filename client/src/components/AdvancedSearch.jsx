@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import { apiClient } from '../services/api.js';
 
 const INITIAL_QUERY = {
   keyword: '',
@@ -22,8 +22,8 @@ function AdvancedSearch() {
 
   const handleSearch = async (event) => {
     event.preventDefault();
-    const { data } = await axios.get('/api/search', { params: query });
-    setResults(data.results);
+    const data = await apiClient.searchGames(query);
+    setResults(data);
   };
 
   return (

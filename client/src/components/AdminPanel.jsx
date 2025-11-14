@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import { apiClient } from '../services/api.js';
 
 function AdminPanel() {
   const [metrics, setMetrics] = useState({});
@@ -7,7 +7,7 @@ function AdminPanel() {
   const [status, setStatus] = useState('');
 
   const fetchMetrics = async () => {
-    const { data } = await axios.get('/api/admin/metrics');
+    const data = await apiClient.fetchMetrics();
     setMetrics(data);
   };
 
@@ -18,7 +18,7 @@ function AdminPanel() {
   const handleBroadcast = async (event) => {
     event.preventDefault();
     if (!message) return;
-    const { data } = await axios.post('/api/admin/broadcast', { message });
+    const data = await apiClient.broadcastMessage(message);
     setStatus(`Đã gửi: "${data.message}"`);
     setMessage('');
   };

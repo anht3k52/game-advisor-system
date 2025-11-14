@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import { apiClient } from '../services/api.js';
 
 function CommentModeration() {
   const [comments, setComments] = useState([]);
   const [form, setForm] = useState({ gameId: 'g1', userId: 'u1', rating: 5, content: '' });
 
   const fetchComments = () => {
-    axios.get('/api/comments').then((res) => setComments(res.data));
+    apiClient.fetchComments().then(setComments);
   };
 
   useEffect(() => {
@@ -20,7 +20,7 @@ function CommentModeration() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    await axios.post('/api/comments', {
+    await apiClient.createComment({
       ...form,
       rating: Number(form.rating)
     });
@@ -29,8 +29,8 @@ function CommentModeration() {
   };
 
   const handleDelete = async (commentId) => {
-    await axios.delete(`/api/comments/${commentId}`);
-    fetchComments();
+    await apiClient.deleteComment(commentId);
+    setComments((prev) => prev.filter((comment) => comment.id !== commentId));
   };
 
   return (
