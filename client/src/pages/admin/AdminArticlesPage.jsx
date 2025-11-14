@@ -4,8 +4,11 @@ import { useLanguage } from '../../context/LanguageContext.jsx';
 
 const initialForm = {
   title: '',
+  titleVi: '',
   shortDescription: '',
+  shortDescriptionVi: '',
   content: '',
+  contentVi: '',
   thumbnailUrl: '',
   relatedGameId: '',
   tags: ''
@@ -17,8 +20,7 @@ export default function AdminArticlesPage() {
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
   const [listLoading, setListLoading] = useState(true);
-  const { t } = useLanguage();
-
+  const { t, language } = useLanguage();
   useEffect(() => {
     load();
   }, []);
@@ -101,19 +103,32 @@ export default function AdminArticlesPage() {
             required
           />
           <input
+            name="titleVi"
+            value={form.titleVi}
+            onChange={handleChange}
+            placeholder={t('admin.articles.form.titleVi')}
+          />
+          <input
             name="shortDescription"
             value={form.shortDescription}
             onChange={handleChange}
             placeholder={t('admin.articles.form.shortDescription')}
             required
           />
-          <textarea
-            name="content"
-            value={form.content}
+          <input
+            name="shortDescriptionVi"
+            value={form.shortDescriptionVi}
             onChange={handleChange}
-            placeholder={t('admin.articles.form.content')}
+            placeholder={t('admin.articles.form.shortDescriptionVi')}
+          />
+
+          
+          <textarea
+            name="contentVi"
+            value={form.contentVi}
+            onChange={handleChange}
+            placeholder={t('admin.articles.form.contentVi')}
             rows={6}
-            required
           />
           <input
             name="thumbnailUrl"
@@ -159,6 +174,24 @@ export default function AdminArticlesPage() {
                 </tr>
               </thead>
               <tbody>
+                {articles.map((article) => {
+                  const displayTitle =
+                    language === 'vi'
+                      ? article.titleVi || article.title
+                      : article.title || article.titleVi;
+                  return (
+                    <tr key={article._id}>
+                      <td>{displayTitle}</td>
+                      <td>{(article.tags || []).join(', ')}</td>
+                      <td>{article.publishedAt ? new Date(article.publishedAt).toLocaleDateString() : '—'}</td>
+                      <td>
+                        <button type="button" onClick={() => handleDelete(article._id)} className="btn-link">
+                          {t('admin.articles.table.delete')}
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
                 {articles.map((article) => (
                   <tr key={article._id}>
                     <td>{article.title}</td>
