@@ -31,21 +31,23 @@ export default function LoginPage() {
 
   return (
     <div className="page auth-page">
-      <h1>{t('auth.loginTitle')}</h1>
-      <form onSubmit={handleSubmit} className="auth-form">
-        <label>
-          {t('auth.identifier')}
-          <input value={identifier} onChange={(event) => setIdentifier(event.target.value)} required />
-        </label>
-        <label>
-          {t('auth.password')}
-          <input type="password" value={password} onChange={(event) => setPassword(event.target.value)} required />
-        </label>
-        {error && <p className="error">{error}</p>}
-        <button type="submit" className="btn-primary" disabled={loading}>
-          {loading ? t('auth.loggingIn') : t('auth.login')}
-        </button>
-      </form>
+      <div className="auth-card">
+        <h1>{t('auth.loginTitle')}</h1>
+        <form onSubmit={handleSubmit} className="auth-form">
+          <label>
+            {t('auth.identifier')}
+            <input value={identifier} onChange={(event) => setIdentifier(event.target.value)} required />
+          </label>
+          <label>
+            {t('auth.password')}
+            <input type="password" value={password} onChange={(event) => setPassword(event.target.value)} required />
+          </label>
+          {error && <p className="error">{error}</p>}
+          <button type="submit" className="btn-primary" disabled={loading}>
+            {loading ? t('auth.loggingIn') : t('auth.login')}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

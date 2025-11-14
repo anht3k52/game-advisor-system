@@ -1,4 +1,4 @@
-import { Link, Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom';
+import { Link, NavLink, Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom';
 import HomePage from './pages/HomePage.jsx';
 import ArticleDetailPage from './pages/ArticleDetailPage.jsx';
 import GameListPage from './pages/GameListPage.jsx';
@@ -95,9 +95,10 @@ function Layout() {
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
   const location = useLocation();
+  const { t } = useLanguage();
 
   if (loading) {
-    return <div className="page-loader">Loading…</div>;
+    return <div className="page-loader">{t('common.loading')}</div>;
   }
 
   if (!user) {
@@ -110,9 +111,10 @@ function ProtectedRoute({ children }) {
 function AdminRoute({ children }) {
   const { user, loading } = useAuth();
   const location = useLocation();
+  const { t } = useLanguage();
 
   if (loading) {
-    return <div className="page-loader">Loading…</div>;
+    return <div className="page-loader">{t('common.loading')}</div>;
   }
 
   if (!user || user.role !== 'admin') {
@@ -162,13 +164,31 @@ export default function App() {
 }
 
 function AdminLayout() {
+  const { t } = useLanguage();
+
+  function navClass({ isActive }) {
+    return `admin-nav-link${isActive ? ' active' : ''}`;
+  }
+
   return (
     <div className="admin-shell">
       <nav className="admin-nav">
-        <Link to="/admin">Dashboard</Link>
-        <Link to="/admin/users">Users</Link>
-        <Link to="/admin/articles">Articles</Link>
-        <Link to="/admin/comments">Comments</Link>
+        <div className="admin-nav-header">
+          <h2>{t('admin.layout.title')}</h2>
+          <p>{t('admin.layout.subtitle')}</p>
+        </div>
+        <NavLink to="/admin" end className={navClass}>
+          {t('admin.navigation.dashboard')}
+        </NavLink>
+        <NavLink to="/admin/users" className={navClass}>
+          {t('admin.navigation.users')}
+        </NavLink>
+        <NavLink to="/admin/articles" className={navClass}>
+          {t('admin.navigation.articles')}
+        </NavLink>
+        <NavLink to="/admin/comments" className={navClass}>
+          {t('admin.navigation.comments')}
+        </NavLink>
       </nav>
       <section className="admin-content">
         <Outlet />
@@ -178,12 +198,14 @@ function AdminLayout() {
 }
 
 function NotFoundPage() {
+  const { t } = useLanguage();
+
   return (
     <div className="page">
-      <h1>Not Found</h1>
-      <p>The page you are looking for does not exist.</p>
+      <h1>{t('notFound.title')}</h1>
+      <p>{t('notFound.description')}</p>
       <Link to="/" className="btn-primary">
-        Go Home
+        {t('notFound.cta')}
       </Link>
     </div>
   );
