@@ -2,8 +2,8 @@
 
 Giải pháp mẫu cho website "Hệ thống tư vấn game" với kiến trúc **React + Node.js**. Dự án bao gồm hai phần:
 
-- **Backend (server/)**: API RESTful bằng Express quản lý người dùng, game, gợi ý thông minh, tìm kiếm nâng cao, so sánh, bình luận/đánh giá và bảng điều khiển quản trị.
-- **Frontend (client/)**: Ứng dụng React tiêu thụ các API, cung cấp giao diện quản lý và tư vấn game thời gian thực.
+- **Backend (server/)**: API RESTful bằng Express quản lý người dùng, bài viết, game, gợi ý thông minh, tìm kiếm nâng cao, so sánh, bình luận/đánh giá và bảng điều khiển quản trị.
+- **Frontend (client/)**: Ứng dụng React tiêu thụ các API, cung cấp song song **giao diện người dùng** và **bảng điều khiển quản trị viên**.
 
 ## Cấu trúc thư mục
 
@@ -14,12 +14,16 @@ Giải pháp mẫu cho website "Hệ thống tư vấn game" với kiến trúc 
 │   │   ├── App.jsx
 │   │   ├── main.jsx
 │   │   ├── styles.css
+│   │   ├── pages/
+│   │   │   ├── AdminPortal.jsx
+│   │   │   └── UserPortal.jsx
 │   │   └── components/
 │   │       ├── AdminPanel.jsx
 │   │       ├── AdvancedSearch.jsx
 │   │       ├── CommentModeration.jsx
 │   │       ├── GameComparison.jsx
 │   │       ├── GameManagement.jsx
+│   │       ├── PostManagement.jsx
 │   │       ├── RecommendationCenter.jsx
 │   │       └── UserManagement.jsx
 │   ├── index.html
@@ -31,19 +35,29 @@ Giải pháp mẫu cho website "Hệ thống tư vấn game" với kiến trúc 
     │   ├── data/
     │   │   ├── comments.js
     │   │   ├── games.js
+    │   │   ├── postComments.js
+    │   │   ├── posts.js
     │   │   └── users.js
+    │   ├── middleware/
+    │   │   └── auth.js
     │   ├── routes/
     │   │   ├── adminRoutes.js
+    │   │   ├── authRoutes.js
     │   │   ├── commentRoutes.js
     │   │   ├── comparisonRoutes.js
     │   │   ├── externalGameRoutes.js
     │   │   ├── gameRoutes.js
+    │   │   ├── postCommentRoutes.js
+    │   │   ├── postRoutes.js
     │   │   ├── recommendationRoutes.js
     │   │   ├── searchRoutes.js
     │   │   └── userRoutes.js
-    │   └── services/
-    │       ├── externalGameApi.js
-    │       └── recommendationService.js
+    │   ├── services/
+    │   │   ├── authService.js
+    │   │   ├── externalGameApi.js
+    │   │   └── sessionService.js
+    │   └── utils/
+    │       └── userUtils.js
     └── package.json
 ```
 
@@ -92,17 +106,36 @@ VITE_USE_MOCK=true npm run dev
 
 Chế độ này tự động sử dụng dữ liệu demo (user, game, bình luận...) và hiển thị banner "Chế độ mô phỏng" ngay trên giao diện.
 
+## Luồng người dùng & quản trị
+
+- **Giao diện người dùng (`/`)**
+  - Cho phép đăng ký, đăng nhập, xem bài viết tư vấn, nhận gợi ý game và để lại bình luận.
+  - Sau khi đăng nhập, người dùng có thể tương tác trực tiếp với bài viết, phần tư vấn và tìm kiếm nâng cao.
+- **Giao diện quản trị (`/admin`)**
+  - Yêu cầu tài khoản có vai trò `admin`. Quản trị viên có thể tạo/sửa/xóa bài viết, quản lý người dùng và kiểm duyệt bình luận.
+  - Bảng điều khiển hiển thị số liệu tổng quan và cho phép phát thông báo đến cộng đồng.
+
+> Dự án sử dụng dữ liệu mẫu trong bộ nhớ để minh hoạ luồng chức năng. Khi triển khai thực tế có thể thay thế bằng database, cơ chế xác thực, AI model chuyên sâu.
+
+### Tài khoản mẫu
+
+| Vai trò       | Email               | Mật khẩu   |
+| ------------- | ------------------- | ---------- |
+| Người dùng    | minh@example.com    | `User123!` |
+| Quản trị viên | linh@example.com    | `Admin123!` |
+
+Bạn có thể đăng ký thêm tài khoản mới trực tiếp trên giao diện người dùng. Admin có thể tạo thêm tài khoản và cấp quyền ngay trong bảng quản lý.
+
 ## Các module chính
 
-- **Quản lý người dùng**: thêm/sửa/xóa người dùng và cấu hình sở thích.
-- **Quản lý game**: cập nhật kho game với thông tin chi tiết.
+- **Bài viết & bình luận người dùng**: người dùng đọc bài viết, bình luận; quản trị viên quản lý toàn bộ vòng đời nội dung.
+- **Quản lý người dùng**: thêm/sửa/xóa người dùng, cấu hình sở thích và phân quyền vai trò.
+- **Quản lý game**: cập nhật kho game nội bộ.
 - **Tư vấn game thông minh**: thuật toán chấm điểm dựa trên sở thích, nền tảng, ngân sách.
-- **Tìm kiếm nâng cao**: lọc game theo từ khóa, thể loại, giá, rating, tag.
+- **Tìm kiếm nâng cao**: lọc game theo từ khóa, thể loại, giá, rating, tag; hỗ trợ lấy dữ liệu từ RAWG.
 - **So sánh game**: so sánh nhanh nhiều tựa game.
-- **Bình luận – đánh giá**: quản lý phản hồi người chơi, hỗ trợ CRUD.
-- **Quản trị hệ thống**: thống kê tổng quan và gửi thông báo hệ thống.
-
-> Dự án sử dụng dữ liệu mẫu trong bộ nhớ để minh hoạ luồng chức năng. Khi triển khai thực tế có thể thay thế bằng database, cơ chế xác thực, AI model chuyên sâu…
+- **Bình luận – đánh giá game**: quản lý phản hồi người chơi, hỗ trợ CRUD.
+- **Quản trị hệ thống**: thống kê tổng quan, gửi thông báo và kiểm duyệt bình luận.
 
 ## Tích hợp API game bên thứ ba (RAWG.io)
 
@@ -134,6 +167,11 @@ Từ phiên bản này, hệ thống có thể lấy dữ liệu game thật t�
 
 ### 3. Endpoint mới của hệ thống
 
+- `POST /api/auth/register` — Đăng ký tài khoản người dùng và tạo phiên đăng nhập.
+- `POST /api/auth/login` — Đăng nhập, trả về token phiên và thông tin người dùng (role, sở thích...).
+- `POST /api/auth/logout` — Hủy phiên đang hoạt động.
+- `GET /api/posts` / `POST /api/posts` / `PUT /api/posts/:id` / `DELETE /api/posts/:id` — CRUD bài viết (các thao tác ghi yêu cầu quyền quản trị).
+- `GET /api/posts/:postId/comments` / `POST /api/posts/:postId/comments` / `DELETE /api/posts/:postId/comments/:commentId` — Quản lý bình luận cho từng bài viết.
 - `GET /api/external-games/search?query=zelda&page=1`
   - Proxy tới `RAWG /games`. Trả về danh sách game với tên, ngày phát hành, rating, nền tảng, Metacritic...
 - `GET /api/external-games/:id`

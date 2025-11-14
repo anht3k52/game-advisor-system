@@ -1,5 +1,12 @@
 import axios from 'axios';
-import { mockUsers, mockGames, mockComments, mockBroadcasts } from '../mockData.js';
+import {
+  mockUsers,
+  mockGames,
+  mockComments,
+  mockBroadcasts,
+  mockPosts,
+  mockPostComments
+} from '../mockData.js';
 
 const api = axios.create({
   baseURL: '/api'
@@ -11,21 +18,40 @@ const mockState = {
   users: mockUsers.map((user) => ({ ...user })),
   games: mockGames.map((game) => ({ ...game })),
   comments: mockComments.map((comment) => ({ ...comment })),
-  broadcasts: mockBroadcasts
+  posts: mockPosts.map((post) => ({ ...post })),
+  postComments: mockPostComments.map((comment) => ({ ...comment })),
+  broadcasts: mockBroadcasts.map((entry) => ({ ...entry })),
+  credentials: {
+    'minh@example.com': { password: 'User123!', userId: 'u1' },
+    'linh@example.com': { password: 'Admin123!', userId: 'u2' }
+  },
+  sessions: {}
 };
 
 const delay = (ms = 400) => new Promise((resolve) => setTimeout(resolve, ms));
-
 const clone = (value) => JSON.parse(JSON.stringify(value));
-
 const randomId = (prefix) => `${prefix}_${Math.random().toString(36).slice(2, 9)}`;
+
+let authToken = null;
+
+function applyToken(token) {
+  authToken = token || null;
+  if (authToken) {
+    api.defaults.headers.common['x-auth-token'] = authToken;
+  } else {
+    delete api.defaults.headers.common['x-auth-token'];
+  }
+}
 
 async function withMock(realCall, mockCall) {
   if (!shouldMock) {
     try {
-      return await realCall();
+      const result = await realCall();
+      return result;
     } catch (error) {
-      if (!mockCall) throw error;
+      if (!mockCall) {
+        throw error;
+      }
       console.warn('Không kết nối được API thật, chuyển sang dữ liệu mô phỏng.', error);
     }
   }
@@ -47,12 +73,7 @@ const recommendationWeights = {
 };
 
 const scoreGame = (game, preferences = {}) => {
-  const {
-    favoriteGenres = [],
-    preferredPlatforms = [],
-    budget,
-    playStyles = []
-  } = preferences;
+  const { favoriteGenres = [], preferredPlatforms = [], budget, playStyles = [] } = preferences;
 
   let score = 0;
 
@@ -137,7 +158,110 @@ const calculateMetrics = () => {
   };
 };
 
+const toPublicUser = (user) => {
+  if (!user) return null;
+  const { passwordHash, ...rest } = user;
+  return { ...rest };
+};
+
+const ensureMockCredential = (email, password, userId) => {
+  mockState.credentials[email.toLowerCase()] = { password, userId };
+};
+
+const startMockSession = (userId) => {
+  const token = randomId('token');
+  mockState.sessions[token] = { userId, createdAt: Date.now() };
+  return token;
+};
+
+const resolveMockSession = (token) => {
+  const session = token ? mockState.sessions[token] : undefined;
+  if (!session) return null;
+  return mockState.users.find((user) => user.id === session.userId) ?? null;
+};
+
 export const apiClient = {
+  setAuthToken(token) {
+    applyToken(token);
+  },
+
+  async register(payload) {
+    return withMock(
+      () => api.post('/auth/register', payload).then((res) => res.data),
+      () => {
+        const { name, email, password } = payload;
+        if (!name || !email || !password) {
+          throw new Error('Thiếu thông tin đăng ký');
+        }
+
+        const exists = mockState.users.find((user) => user.email.toLowerCase() === email.toLowerCase());
+        if (exists) {
+          const error = new Error('Email đã được đăng ký.');
+          error.status = 409;
+          throw error;
+        }
+
+        const user = {
+          id: randomId('u'),
+          name,
+          email,
+          role: 'user',
+          preferences: { favoriteGenres: [], preferredPlatforms: [], budget: null, playStyles: [] },
+          createdAt: new Date().toISOString()
+        };
+        mockState.users.push(user);
+        ensureMockCredential(email, password, user.id);
+        const token = startMockSession(user.id);
+        applyToken(token);
+        return { token, user: clone(user) };
+      }
+    ).then((result) => {
+      if (result?.token) {
+        applyToken(result.token);
+      }
+      return result;
+    });
+  },
+
+  async login(payload) {
+    return withMock(
+      () => api.post('/auth/login', payload).then((res) => res.data),
+      () => {
+        const { email, password } = payload;
+        const credential = mockState.credentials[email.toLowerCase()];
+        if (!credential || credential.password !== password) {
+          const error = new Error('Thông tin đăng nhập không chính xác.');
+          error.status = 401;
+          throw error;
+        }
+        const user = mockState.users.find((candidate) => candidate.id === credential.userId);
+        const token = startMockSession(user.id);
+        applyToken(token);
+        return { token, user: clone(user) };
+      }
+    ).then((result) => {
+      if (result?.token) {
+        applyToken(result.token);
+      }
+      return result;
+    });
+  },
+
+  async logout() {
+    return withMock(
+      () => api.post('/auth/logout').then((res) => res.data),
+      () => {
+        if (authToken) {
+          delete mockState.sessions[authToken];
+        }
+        applyToken(null);
+        return { success: true };
+      }
+    ).finally(() => {
+      applyToken(null);
+    });
+  },
+
   async fetchUsers() {
     return withMock(
       () => api.get('/users').then((res) => res.data),
@@ -149,9 +273,217 @@ export const apiClient = {
     return withMock(
       () => api.post('/users', payload).then((res) => res.data),
       () => {
-        const created = { id: randomId('u'), ...payload };
-        mockState.users.push(created);
-        return clone(created);
+        const { name, email, password, role = 'user', preferences = {} } = payload;
+        if (!name || !email || !password) {
+          throw new Error('Thiếu thông tin tạo người dùng.');
+        }
+        const exists = mockState.users.find((user) => user.email.toLowerCase() === email.toLowerCase());
+        if (exists) {
+          const error = new Error('Email đã được sử dụng.');
+          error.status = 409;
+          throw error;
+        }
+        const user = {
+          id: randomId('u'),
+          name,
+          email,
+          role,
+          preferences,
+          createdAt: new Date().toISOString()
+        };
+        mockState.users.push(user);
+        ensureMockCredential(email, password, user.id);
+        return clone(user);
+      }
+    );
+  },
+
+  async updateUser(userId, payload) {
+    return withMock(
+      () => api.put(`/users/${userId}`, payload).then((res) => res.data),
+      () => {
+        const user = mockState.users.find((candidate) => candidate.id === userId);
+        if (!user) {
+          const error = new Error('Người dùng không tồn tại.');
+          error.status = 404;
+          throw error;
+        }
+        if (payload.email && payload.email !== user.email) {
+          const duplicate = mockState.users.find(
+            (candidate) => candidate.email.toLowerCase() === payload.email.toLowerCase()
+          );
+          if (duplicate) {
+            const error = new Error('Email đã được sử dụng.');
+            error.status = 409;
+            throw error;
+          }
+          user.email = payload.email;
+        }
+        if (payload.name !== undefined) user.name = payload.name;
+        if (payload.role !== undefined) user.role = payload.role;
+        if (payload.preferences !== undefined) {
+          user.preferences = payload.preferences;
+        }
+        if (payload.password) {
+          ensureMockCredential(user.email, payload.password, user.id);
+        }
+        return clone(user);
+      }
+    );
+  },
+
+  async deleteUser(userId) {
+    return withMock(
+      () => api.delete(`/users/${userId}`).then((res) => res.data),
+      () => {
+        const index = mockState.users.findIndex((candidate) => candidate.id === userId);
+        if (index === -1) {
+          const error = new Error('Người dùng không tồn tại.');
+          error.status = 404;
+          throw error;
+        }
+        const [removed] = mockState.users.splice(index, 1);
+        delete mockState.credentials[removed.email.toLowerCase()];
+        Object.entries(mockState.sessions).forEach(([token, session]) => {
+          if (session.userId === removed.id) {
+            delete mockState.sessions[token];
+          }
+        });
+        return clone(removed);
+      }
+    );
+  },
+
+  async fetchPosts() {
+    return withMock(
+      () => api.get('/posts').then((res) => res.data),
+      () => clone(
+        mockState.posts.slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      )
+    );
+  },
+
+  async fetchPost(postId) {
+    return withMock(
+      () => api.get(`/posts/${postId}`).then((res) => res.data),
+      () => {
+        const post = mockState.posts.find((candidate) => candidate.id === postId);
+        if (!post) {
+          const error = new Error('Bài viết không tồn tại.');
+          error.status = 404;
+          throw error;
+        }
+        return clone(post);
+      }
+    );
+  },
+
+  async createPost(payload) {
+    return withMock(
+      () => api.post('/posts', payload).then((res) => res.data),
+      () => {
+        const post = {
+          id: randomId('p'),
+          title: payload.title,
+          summary: payload.summary,
+          content: payload.content,
+          tags: payload.tags ?? [],
+          coverUrl: payload.coverUrl || null,
+          authorId: resolveMockSession(authToken)?.id ?? 'u2',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+        mockState.posts.push(post);
+        return clone(post);
+      }
+    );
+  },
+
+  async updatePost(postId, payload) {
+    return withMock(
+      () => api.put(`/posts/${postId}`, payload).then((res) => res.data),
+      () => {
+        const post = mockState.posts.find((candidate) => candidate.id === postId);
+        if (!post) {
+          const error = new Error('Bài viết không tồn tại.');
+          error.status = 404;
+          throw error;
+        }
+        Object.assign(post, payload, { updatedAt: new Date().toISOString() });
+        return clone(post);
+      }
+    );
+  },
+
+  async deletePost(postId) {
+    return withMock(
+      () => api.delete(`/posts/${postId}`).then((res) => res.data),
+      () => {
+        const index = mockState.posts.findIndex((candidate) => candidate.id === postId);
+        if (index === -1) {
+          const error = new Error('Bài viết không tồn tại.');
+          error.status = 404;
+          throw error;
+        }
+        const [removed] = mockState.posts.splice(index, 1);
+        mockState.postComments = mockState.postComments.filter((comment) => comment.postId !== postId);
+        return clone(removed);
+      }
+    );
+  },
+
+  async fetchPostComments(postId) {
+    return withMock(
+      () => api.get(`/posts/${postId}/comments`).then((res) => res.data),
+      () => clone(
+        mockState.postComments
+          .filter((comment) => comment.postId === postId)
+          .map((comment) => ({
+            ...comment,
+            userName: mockState.users.find((user) => user.id === comment.userId)?.name || 'Ẩn danh'
+          }))
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      )
+    );
+  },
+
+  async createPostComment(postId, payload) {
+    return withMock(
+      () => api.post(`/posts/${postId}/comments`, payload).then((res) => res.data),
+      () => {
+        const user = resolveMockSession(authToken);
+        if (!user) {
+          const error = new Error('Yêu cầu đăng nhập.');
+          error.status = 401;
+          throw error;
+        }
+        const comment = {
+          id: randomId('pc'),
+          postId,
+          userId: user.id,
+          content: payload.content,
+          createdAt: new Date().toISOString()
+        };
+        mockState.postComments.push(comment);
+        return clone(comment);
+      }
+    );
+  },
+
+  async deletePostComment(postId, commentId) {
+    return withMock(
+      () => api.delete(`/posts/${postId}/comments/${commentId}`).then((res) => res.data),
+      () => {
+        const index = mockState.postComments.findIndex(
+          (comment) => comment.id === commentId && comment.postId === postId
+        );
+        if (index === -1) {
+          const error = new Error('Bình luận không tồn tại.');
+          error.status = 404;
+          throw error;
+        }
+        const [removed] = mockState.postComments.splice(index, 1);
+        return clone(removed);
       }
     );
   },
@@ -176,10 +508,7 @@ export const apiClient = {
 
   async recommend(preferences) {
     return withMock(
-      () =>
-        api
-          .post('/recommendations', { preferences })
-          .then((res) => res.data.recommendations),
+      () => api.post('/recommendations', { preferences }).then((res) => res.data.recommendations),
       () => {
         const scored = mockState.games
           .map((game) => ({ ...game, score: scoreGame(game, preferences) }))
@@ -201,10 +530,7 @@ export const apiClient = {
 
   async searchExternalGames({ query = '', page = 1 } = {}) {
     return withMock(
-      () =>
-        api
-          .get('/external-games/search', { params: { query, page } })
-          .then((res) => res.data),
+      () => api.get('/external-games/search', { params: { query, page } }).then((res) => res.data),
       () => {
         const keyword = query.trim().toLowerCase();
         const filtered = mockState.games

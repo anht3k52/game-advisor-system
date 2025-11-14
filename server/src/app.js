@@ -1,7 +1,10 @@
 import express from 'express';
 import cors from 'cors';
 
+import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import postRoutes from './routes/postRoutes.js';
+import postCommentRoutes from './routes/postCommentRoutes.js';
 import gameRoutes from './routes/gameRoutes.js';
 import recommendationRoutes from './routes/recommendationRoutes.js';
 import searchRoutes from './routes/searchRoutes.js';
@@ -19,7 +22,10 @@ app.get('/api/health', (_, res) => {
   res.json({ status: 'ok', message: 'Game Advisor API is healthy' });
 });
 
+app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/posts', postRoutes);
+app.use('/api/posts/:postId/comments', postCommentRoutes);
 app.use('/api/games', gameRoutes);
 app.use('/api/external-games', externalGameRoutes);
 app.use('/api/recommendations', recommendationRoutes);

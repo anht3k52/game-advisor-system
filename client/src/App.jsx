@@ -1,39 +1,75 @@
-import React from 'react';
-import UserManagement from './components/UserManagement.jsx';
-import GameManagement from './components/GameManagement.jsx';
-import RecommendationCenter from './components/RecommendationCenter.jsx';
-import AdvancedSearch from './components/AdvancedSearch.jsx';
-import GameComparison from './components/GameComparison.jsx';
-import CommentModeration from './components/CommentModeration.jsx';
-import AdminPanel from './components/AdminPanel.jsx';
+import React, { useEffect, useMemo, useState } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import UserPortal from './pages/UserPortal.jsx';
+import AdminPortal from './pages/AdminPortal.jsx';
+import { apiClient } from './services/api.js';
+
+const SESSION_KEY = 'game-advisor-session';
+
+const loadSession = () => {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+  const raw = window.localStorage.getItem(SESSION_KEY);
+  if (!raw) {
+    return null;
+  }
+  try {
+    return JSON.parse(raw);
+  } catch (error) {
+    console.warn('Không thể đọc phiên đăng nhập đã lưu.', error);
+    return null;
+  }
+};
 
 function App() {
-  const isMockMode = import.meta.env.VITE_USE_MOCK === 'true';
+  const [session, setSession] = useState(loadSession);
+
+  useEffect(() => {
+    apiClient.setAuthToken(session?.token ?? null);
+    if (typeof window === 'undefined') {
+      return;
+    }
+    if (session) {
+      window.localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    } else {
+      window.localStorage.removeItem(SESSION_KEY);
+    }
+  }, [session]);
+
+  const handleLogin = (value) => {
+    if (!value) {
+      return;
+    }
+    setSession({ token: value.token, user: value.user });
+  };
+
+  const handleLogout = async () => {
+    try {
+      await apiClient.logout();
+    } catch (error) {
+      console.warn('Không thể đăng xuất khỏi API, sẽ xóa phiên cục bộ.', error);
+    } finally {
+      setSession(null);
+    }
+  };
+
+  const isAdmin = useMemo(() => session?.user?.role === 'admin', [session]);
 
   return (
-    <div className="app-shell">
-      <header>
-        <h1>🎮 Hệ thống tư vấn game</h1>
-        <p>
-          Kiến trúc React + Node.js với các module quản trị, gợi ý thông minh và trải nghiệm người dùng toàn diện.
-        </p>
-        {isMockMode && (
-          <div className="demo-banner">
-            <strong>🧪 Chế độ mô phỏng đang bật.</strong> Không cần backend, dữ liệu demo sẽ được sử dụng để khám phá giao diện.
-          </div>
-        )}
-      </header>
-
-      <section className="grid modules-grid">
-        <UserManagement />
-        <GameManagement />
-        <RecommendationCenter />
-        <AdvancedSearch />
-        <GameComparison />
-        <CommentModeration />
-        <AdminPanel />
-      </section>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path="/"
+          element={<UserPortal session={session} onLogin={handleLogin} onLogout={handleLogout} isAdmin={isAdmin} />}
+        />
+        <Route
+          path="/admin"
+          element={<AdminPortal session={session} onLogin={handleLogin} onLogout={handleLogout} isAdmin={isAdmin} />}
+        />
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
