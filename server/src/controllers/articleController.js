@@ -27,27 +27,33 @@ export async function createArticle(req, res, next) {
       tags,
       publishedAt
     } = req.body;
-    const generatedSlug = slug
-      ? slug.toLowerCase()
-      : slugify(title, { lower: true, strict: true });
 
-    const existing = await Article.findOne({ slug: generatedSlug });
-    if (existing) {
-      return res.status(409).json({ error: 'Slug already exists' });
+    const slugOptions = { lower: true, strict: true, locale: 'vi' };
+    const baseSlugCandidate = slug ? slugify(slug, slugOptions) : slugify(title, slugOptions);
+    let baseSlug = baseSlugCandidate || slugify(`article-${Date.now()}`, slugOptions);
+
+    let uniqueSlug = baseSlug;
+    let suffix = 1;
+    while (await Article.exists({ slug: uniqueSlug })) {
+      uniqueSlug = `${baseSlug}-${suffix++}`;
     }
+
+    const normalizedTags = Array.isArray(tags)
+      ? tags.map((tag) => tag.trim()).filter(Boolean)
+      : [];
 
     const article = await Article.create({
       title,
       titleVi,
-      slug: generatedSlug,
+      slug: uniqueSlug,
       thumbnailUrl,
       shortDescription,
       shortDescriptionVi,
       content,
       contentVi,
-      relatedGameId,
+      relatedGameId: relatedGameId || undefined,
       author: req.user._id,
-      tags,
+      tags: normalizedTags,
       publishedAt: publishedAt || new Date()
     });
 
@@ -165,15 +171,29 @@ export async function updateArticle(req, res, next) {
     }
 
     if (title) article.title = title;
-    if (slug) article.slug = slug.toLowerCase();
+    if (slug) {
+      const slugOptions = { lower: true, strict: true, locale: 'vi' };
+      const normalizedSlug = slugify(slug, slugOptions) || article.slug;
+      const conflict = await Article.exists({ slug: normalizedSlug, _id: { $ne: id } });
+      if (conflict) {
+        return res.status(409).json({ error: 'Slug already exists' });
+      }
+      article.slug = normalizedSlug;
+    }
     if (titleVi !== undefined) article.titleVi = titleVi;
     if (thumbnailUrl !== undefined) article.thumbnailUrl = thumbnailUrl;
     if (shortDescription !== undefined) article.shortDescription = shortDescription;
     if (shortDescriptionVi !== undefined) article.shortDescriptionVi = shortDescriptionVi;
     if (content !== undefined) article.content = content;
     if (contentVi !== undefined) article.contentVi = contentVi;
-    if (relatedGameId !== undefined) article.relatedGameId = relatedGameId;
-    if (tags !== undefined) article.tags = tags;
+    if (relatedGameId !== undefined) {
+      article.relatedGameId = relatedGameId || undefined;
+    }
+    if (tags !== undefined) {
+      article.tags = Array.isArray(tags)
+        ? tags.map((tag) => tag.trim()).filter(Boolean)
+        : [];
+    }
     if (publishedAt !== undefined) article.publishedAt = publishedAt;
 
     await article.save();

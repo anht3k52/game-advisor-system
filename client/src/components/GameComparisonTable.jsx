@@ -1,15 +1,23 @@
+import { useLanguage } from '../context/LanguageContext.jsx';
+
 export default function GameComparisonTable({ games }) {
+  const { t } = useLanguage();
+
   if (!games.length) return null;
 
   const headers = [
-    { key: 'name', label: 'Name' },
-    { key: 'released', label: 'Release date' },
-    { key: 'rating', label: 'Rating' },
-    { key: 'metacritic', label: 'Metacritic' },
-    { key: 'genres', label: 'Genres', render: (value) => value?.map((genre) => genre.name).join(', ') },
+    { key: 'name', label: t('comparison.table.name') },
+    { key: 'released', label: t('comparison.table.released') },
+    { key: 'rating', label: t('comparison.table.rating') },
+    { key: 'metacritic', label: t('comparison.table.metacritic') },
+    {
+      key: 'genres',
+      label: t('comparison.table.genres'),
+      render: (value) => value?.map((genre) => genre.name).join(', ')
+    },
     {
       key: 'platforms',
-      label: 'Platforms',
+      label: t('comparison.table.platforms'),
       render: (value) => value?.map((platform) => platform.platform?.name || platform.name).join(', ')
     }
   ];
@@ -18,7 +26,7 @@ export default function GameComparisonTable({ games }) {
     <table className="comparison-table">
       <thead>
         <tr>
-          <th>Attribute</th>
+          <th>{t('comparison.table.attribute')}</th>
           {games.map((game) => (
             <th key={game.id}>{game.name}</th>
           ))}
