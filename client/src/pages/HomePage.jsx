@@ -15,7 +15,7 @@ export default function HomePage() {
     try {
       setLoading(true);
       setError('');
-      const data = await fetchArticles({ page, limit: 6 });
+      const data = await fetchArticles({ page, limit: 8 });
       setArticles(data.data);
       setPagination(data.pagination);
     } catch (err) {
