@@ -173,17 +173,15 @@ const translations = {
           submitting: 'Creating…',
           update: 'Save changes',
           updating: 'Saving…',
-          cancelEdit: 'Cancel edit',
-          submitting: 'Creating…'
+          cancelEdit: 'Cancel edit'
         },
-         
         errors: {
           load: 'Unable to load articles',
           create: 'Unable to create article',
           update: 'Unable to update article',
           delete: 'Unable to delete article',
-          slugConflict: 'An article with that address already exists. Please adjust the title or slug.',
-          delete: 'Unable to delete article',
+          slugConflict: 'An article with that address already exists. Please adjust the title or slug.'
+        },
         confirmDelete: 'Delete this article?',
         table: {
           title: 'Title',
@@ -421,16 +419,14 @@ const translations = {
           submitting: 'Đang tạo…',
           update: 'Lưu thay đổi',
           updating: 'Đang lưu…',
-          cancelEdit: 'Hủy chỉnh sửa',
-          submitting: 'Đang tạo…'
+          cancelEdit: 'Hủy chỉnh sửa'
         },
         errors: {
           load: 'Không thể tải danh sách bài viết',
           create: 'Không thể tạo bài viết',
           update: 'Không thể cập nhật bài viết',
           delete: 'Không thể xóa bài viết',
-          slugConflict: 'Đã có bài viết sử dụng địa chỉ này. Vui lòng chỉnh lại tiêu đề hoặc slug.',
-          delete: 'Không thể xóa bài viết'
+          slugConflict: 'Đã có bài viết sử dụng địa chỉ này. Vui lòng chỉnh lại tiêu đề hoặc slug.'
         },
         confirmDelete: 'Bạn có chắc muốn xóa bài viết này?',
         table: {
@@ -501,7 +497,6 @@ const translations = {
     common: {
       loading: 'Đang tải…'
     }
-  }
 }
 };
 function getTranslation(language, key) {
