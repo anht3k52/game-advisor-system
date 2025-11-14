@@ -12,6 +12,7 @@ import comparisonRoutes from './routes/comparisonRoutes.js';
 import commentRoutes from './routes/commentRoutes.js';
 import ratingRoutes from './routes/ratingRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import chatRoutes from './routes/chatRoutes.js';
 
 const app = express();
 
@@ -35,6 +36,7 @@ app.use('/api/comparisons', comparisonRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/ratings', ratingRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/chatbot', chatRoutes);
 
 app.use((err, _req, res, _next) => {
   console.error(err);

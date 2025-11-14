@@ -8,6 +8,7 @@ import RegisterPage from './pages/RegisterPage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
 import AdvancedSearchPage from './pages/AdvancedSearchPage.jsx';
 import GameComparisonPage from './pages/GameComparisonPage.jsx';
+import ChatAdvisorPage from './pages/ChatAdvisorPage.jsx';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage.jsx';
 import AdminUsersPage from './pages/admin/AdminUsersPage.jsx';
 import AdminArticlesPage from './pages/admin/AdminArticlesPage.jsx';
@@ -32,6 +33,7 @@ function Layout() {
             <Link to="/games">{t('nav.games')}</Link>
             <Link to="/search">{t('nav.search')}</Link>
             <Link to="/compare">{t('nav.compare')}</Link>
+            <Link to="/advisor">{t('nav.chatbot')}</Link>
             {user && user.role === 'admin' && (
               <Link to="/admin" className="nav-admin-link">
                 {t('nav.admin')}
@@ -134,6 +136,7 @@ export default function App() {
         <Route path="games/:id" element={<GameDetailPage />} />
         <Route path="search" element={<AdvancedSearchPage />} />
         <Route path="compare" element={<GameComparisonPage />} />
+        <Route path="advisor" element={<ChatAdvisorPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
         <Route
