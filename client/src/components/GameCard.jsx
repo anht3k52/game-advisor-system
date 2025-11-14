@@ -11,6 +11,7 @@ export default function GameCard({ game }) {
           <Link to={`/games/${game.id}`}>{game.name}</Link>
         </h3>
         <p className="game-meta">
+          <span className="game-id">RAWG ID: {game.id}</span>
           <span>Rating: {game.rating?.toFixed ? game.rating.toFixed(1) : game.rating}</span>
           {game.released && <span>Released: {game.released}</span>}
         </p>
