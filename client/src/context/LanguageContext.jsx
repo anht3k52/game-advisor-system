@@ -154,7 +154,7 @@ const translations = {
           submitting: 'Creating…',
           update: 'Save changes',
           updating: 'Saving…',
-          cancelEdit: 'Cancel edit'
+          cancelEdit: 'Cancel edit',
           submitting: 'Creating…'
         },
         errors: {
@@ -162,7 +162,7 @@ const translations = {
           create: 'Unable to create article',
           update: 'Unable to update article',
           delete: 'Unable to delete article',
-          slugConflict: 'An article with that address already exists. Please adjust the title or slug.'
+          slugConflict: 'An article with that address already exists. Please adjust the title or slug.',
           delete: 'Unable to delete article'
         },
         confirmDelete: 'Delete this article?',
@@ -384,7 +384,7 @@ const translations = {
           submitting: 'Đang tạo…',
           update: 'Lưu thay đổi',
           updating: 'Đang lưu…',
-          cancelEdit: 'Hủy chỉnh sửa'
+          cancelEdit: 'Hủy chỉnh sửa',
           submitting: 'Đang tạo…'
         },
         errors: {
@@ -392,7 +392,7 @@ const translations = {
           create: 'Không thể tạo bài viết',
           update: 'Không thể cập nhật bài viết',
           delete: 'Không thể xóa bài viết',
-          slugConflict: 'Đã có bài viết sử dụng địa chỉ này. Vui lòng chỉnh lại tiêu đề hoặc slug.'
+          slugConflict: 'Đã có bài viết sử dụng địa chỉ này. Vui lòng chỉnh lại tiêu đề hoặc slug.',
           delete: 'Không thể xóa bài viết'
         },
         confirmDelete: 'Bạn có chắc muốn xóa bài viết này?',

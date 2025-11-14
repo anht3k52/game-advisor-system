@@ -221,9 +221,7 @@ export default function AdminArticlesPage() {
                 : t(isEditing ? 'admin.articles.form.update' : 'admin.articles.form.submit')}
             </button>
           </div>
-          <button type="submit" className="btn-primary" disabled={saving}>
-            {saving ? t('admin.articles.form.submitting') : t('admin.articles.form.submit')}
-          </button>
+          
         </form>
       </section>
 
