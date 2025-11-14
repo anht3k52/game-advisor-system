@@ -137,6 +137,8 @@ const translations = {
         subtitle: 'Create new guides and keep existing content up to date.',
         formTitle: 'New article',
         formSubtitle: 'Provide complete details before publishing.',
+        editTitle: 'Edit article',
+        editSubtitle: 'Update the details and save your changes.',
         listTitle: 'Existing articles',
         form: {
           title: 'Title (English)',
@@ -149,11 +151,18 @@ const translations = {
           relatedGameId: 'Related RAWG ID',
           tags: 'Tags (comma separated)',
           submit: 'Create article',
+          submitting: 'Creating…',
+          update: 'Save changes',
+          updating: 'Saving…',
+          cancelEdit: 'Cancel edit'
           submitting: 'Creating…'
         },
         errors: {
           load: 'Unable to load articles',
           create: 'Unable to create article',
+          update: 'Unable to update article',
+          delete: 'Unable to delete article',
+          slugConflict: 'An article with that address already exists. Please adjust the title or slug.'
           delete: 'Unable to delete article'
         },
         confirmDelete: 'Delete this article?',
@@ -162,6 +171,7 @@ const translations = {
           tags: 'Tags',
           published: 'Published',
           actions: 'Actions',
+          edit: 'Edit',
           delete: 'Delete'
         },
         empty: 'No articles yet. Start by creating a new post.'
@@ -357,6 +367,8 @@ const translations = {
         subtitle: 'Tạo bài hướng dẫn mới và cập nhật nội dung hiện có.',
         formTitle: 'Bài viết mới',
         formSubtitle: 'Điền đầy đủ thông tin trước khi xuất bản.',
+        editTitle: 'Chỉnh sửa bài viết',
+        editSubtitle: 'Cập nhật thông tin và lưu thay đổi của bạn.',
         listTitle: 'Danh sách bài viết',
         form: {
           title: 'Tiêu đề (Tiếng Anh)',
@@ -369,11 +381,18 @@ const translations = {
           relatedGameId: 'ID RAWG liên quan',
           tags: 'Thẻ (ngăn cách bằng dấu phẩy)',
           submit: 'Tạo bài viết',
+          submitting: 'Đang tạo…',
+          update: 'Lưu thay đổi',
+          updating: 'Đang lưu…',
+          cancelEdit: 'Hủy chỉnh sửa'
           submitting: 'Đang tạo…'
         },
         errors: {
           load: 'Không thể tải danh sách bài viết',
           create: 'Không thể tạo bài viết',
+          update: 'Không thể cập nhật bài viết',
+          delete: 'Không thể xóa bài viết',
+          slugConflict: 'Đã có bài viết sử dụng địa chỉ này. Vui lòng chỉnh lại tiêu đề hoặc slug.'
           delete: 'Không thể xóa bài viết'
         },
         confirmDelete: 'Bạn có chắc muốn xóa bài viết này?',
@@ -382,6 +401,7 @@ const translations = {
           tags: 'Thẻ',
           published: 'Ngày đăng',
           actions: 'Thao tác',
+          edit: 'Chỉnh sửa',
           delete: 'Xóa'
         },
         empty: 'Chưa có bài viết nào. Hãy bắt đầu tạo bài mới.'

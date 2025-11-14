@@ -1,5 +1,10 @@
 import { useEffect, useState } from 'react';
-import { createAdminArticle, deleteAdminArticle, fetchAdminArticles } from '../../services/adminApi.js';
+import {
+  createAdminArticle,
+  deleteAdminArticle,
+  fetchAdminArticles,
+  updateAdminArticle
+} from '../../services/adminApi.js';
 import { useLanguage } from '../../context/LanguageContext.jsx';
 
 const initialForm = {
@@ -20,7 +25,11 @@ export default function AdminArticlesPage() {
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
   const [listLoading, setListLoading] = useState(true);
+  const [editingId, setEditingId] = useState(null);
   const { t, language } = useLanguage();
+
+  const isEditing = Boolean(editingId);
+
   useEffect(() => {
     load();
   }, []);
@@ -48,6 +57,7 @@ export default function AdminArticlesPage() {
     event.preventDefault();
     try {
       setSaving(true);
+      setError('');
       const payload = {
         ...form,
         tags: form.tags
@@ -55,15 +65,54 @@ export default function AdminArticlesPage() {
           .map((tag) => tag.trim())
           .filter(Boolean)
       };
-      await createAdminArticle(payload);
+      if (editingId) {
+        await updateAdminArticle(editingId, payload);
+      } else {
+        await createAdminArticle(payload);
+      }
       setForm({ ...initialForm });
+      setEditingId(null);
       await load();
     } catch (err) {
       console.error(err);
+      const translationKey = editingId
+        ? 'admin.articles.errors.update'
+        : 'admin.articles.errors.create';
+      const responseData = err.response?.data;
+      if (responseData?.error === 'Slug already exists') {
+        setError(t('admin.articles.errors.slugConflict'));
+      } else if (Array.isArray(responseData?.errors) && responseData.errors.length > 0) {
+        setError(responseData.errors.map((item) => item.msg).join(', '));
+      } else {
+        setError(responseData?.error || t(translationKey));
+      }
+
       setError(err.response?.data?.error || t('admin.articles.errors.create'));
     } finally {
       setSaving(false);
     }
+  }
+
+  function handleEdit(article) {
+    setEditingId(article._id);
+    setError('');
+    setForm({
+      title: article.title || '',
+      titleVi: article.titleVi || '',
+      shortDescription: article.shortDescription || '',
+      shortDescriptionVi: article.shortDescriptionVi || '',
+      content: article.content || '',
+      contentVi: article.contentVi || '',
+      thumbnailUrl: article.thumbnailUrl || '',
+      relatedGameId: article.relatedGameId || '',
+      tags: (article.tags || []).join(', ')
+    });
+  }
+
+  function handleCancelEdit() {
+    setEditingId(null);
+    setError('');
+    setForm({ ...initialForm });
   }
 
   async function handleDelete(id) {
@@ -91,6 +140,10 @@ export default function AdminArticlesPage() {
       {error && <p className="error">{error}</p>}
       <section className="admin-card">
         <div className="admin-card-header">
+          <h2>{isEditing ? t('admin.articles.editTitle') : t('admin.articles.formTitle')}</h2>
+          <p className="admin-card-subtitle">
+            {isEditing ? t('admin.articles.editSubtitle') : t('admin.articles.formSubtitle')}
+          </p>
           <h2>{t('admin.articles.formTitle')}</h2>
           <p className="admin-card-subtitle">{t('admin.articles.formSubtitle')}</p>
         </div>
@@ -121,6 +174,14 @@ export default function AdminArticlesPage() {
             onChange={handleChange}
             placeholder={t('admin.articles.form.shortDescriptionVi')}
           />
+          <textarea
+            name="content"
+            value={form.content}
+            onChange={handleChange}
+            placeholder={t('admin.articles.form.content')}
+            rows={6}
+            required
+          />
 
           
           <textarea
@@ -148,6 +209,18 @@ export default function AdminArticlesPage() {
             onChange={handleChange}
             placeholder={t('admin.articles.form.tags')}
           />
+          <div className="admin-form-actions">
+            {isEditing && (
+              <button type="button" className="btn-secondary" onClick={handleCancelEdit} disabled={saving}>
+                {t('admin.articles.form.cancelEdit')}
+              </button>
+            )}
+            <button type="submit" className="btn-primary" disabled={saving}>
+              {saving
+                ? t(isEditing ? 'admin.articles.form.updating' : 'admin.articles.form.submitting')
+                : t(isEditing ? 'admin.articles.form.update' : 'admin.articles.form.submit')}
+            </button>
+          </div>
           <button type="submit" className="btn-primary" disabled={saving}>
             {saving ? t('admin.articles.form.submitting') : t('admin.articles.form.submit')}
           </button>
@@ -185,6 +258,9 @@ export default function AdminArticlesPage() {
                       <td>{(article.tags || []).join(', ')}</td>
                       <td>{article.publishedAt ? new Date(article.publishedAt).toLocaleDateString() : '—'}</td>
                       <td>
+                        <button type="button" onClick={() => handleEdit(article)} className="btn-link">
+                          {t('admin.articles.table.edit')}
+                        </button>
                         <button type="button" onClick={() => handleDelete(article._id)} className="btn-link">
                           {t('admin.articles.table.delete')}
                         </button>

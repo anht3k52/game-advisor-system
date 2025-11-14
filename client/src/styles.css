@@ -249,6 +249,13 @@ a:hover {
   margin-top: 0.25rem;
 }
 
+.admin-form-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  grid-column: 1 / -1;
+}
+
 .admin-card {
   background: linear-gradient(160deg, rgba(15, 23, 42, 0.78), rgba(30, 41, 59, 0.72));
   border-radius: 20px;
