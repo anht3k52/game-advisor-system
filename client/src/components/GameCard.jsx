@@ -1,6 +1,11 @@
 import { Link } from 'react-router-dom';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 export default function GameCard({ game }) {
+  const { t } = useLanguage();
+  const ratingValue =
+    game.rating == null ? null : game.rating?.toFixed ? game.rating.toFixed(1) : game.rating;
+
   return (
     <article className="game-card">
       <Link to={`/games/${game.id}`} className="game-thumb">
@@ -11,6 +16,11 @@ export default function GameCard({ game }) {
           <Link to={`/games/${game.id}`}>{game.name}</Link>
         </h3>
         <p className="game-meta">
+codex/fix-login-and-registration-layout-zkbe15
+          <span className="game-id">{t('games.rawgId', { id: game.id })}</span>
+          {ratingValue != null && <span>{t('games.rating', { rating: ratingValue })}</span>}
+          {game.released && <span>{t('games.release', { date: game.released })}</span>}
+=======
           <span className="game-id">RAWG ID: {game.id}</span>
           <span>Rating: {game.rating?.toFixed ? game.rating.toFixed(1) : game.rating}</span>
           {game.released && <span>Released: {game.released}</span>}
