@@ -3,8 +3,11 @@ import { fetchArticles } from '../services/articleApi.js';
 import { searchGames } from '../services/gameApi.js';
 import ArticleCard from '../components/ArticleCard.jsx';
 import GameCard from '../components/GameCard.jsx';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function AdvancedSearchPage() {
+  const { t } = useLanguage();
+
   const [query, setQuery] = useState('');
   const [type, setType] = useState('all');
   const [filters, setFilters] = useState({});
@@ -18,6 +21,7 @@ export default function AdvancedSearchPage() {
     try {
       setLoading(true);
       setError('');
+
       if (type === 'article' || type === 'all') {
         const articleData = await fetchArticles({ q: query, tags: filters.tags });
         setArticles(articleData.data || []);
@@ -33,7 +37,7 @@ export default function AdvancedSearchPage() {
       }
     } catch (err) {
       console.error(err);
-      setError('Unable to perform search');
+      setError(t("advancedSearch.error"));
     } finally {
       setLoading(false);
     }
@@ -46,32 +50,66 @@ export default function AdvancedSearchPage() {
 
   return (
     <div className="page">
-      <h1>Advanced search</h1>
+      <h1>{t("advancedSearch.title")}</h1>
+
       <form className="search-form" onSubmit={handleSearch}>
-        <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Keyword" />
-        <select value={type} onChange={(event) => setType(event.target.value)}>
-          <option value="all">All</option>
-          <option value="game">Games</option>
-          <option value="article">Articles</option>
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder={t("advancedSearch.keyword")}
+        />
+
+        <select value={type} onChange={(e) => setType(e.target.value)}>
+          <option value="all">{t("advancedSearch.all")}</option>
+          <option value="game">{t("advancedSearch.games")}</option>
+          <option value="article">{t("advancedSearch.articles")}</option>
         </select>
-        <input name="tags" value={filters.tags || ''} onChange={handleFilterChange} placeholder="Article tags" />
-        <input name="genres" value={filters.genres || ''} onChange={handleFilterChange} placeholder="Game genres" />
-        <input name="platforms" value={filters.platforms || ''} onChange={handleFilterChange} placeholder="Platforms" />
-        <input name="dates" value={filters.dates || ''} onChange={handleFilterChange} placeholder="Year or range" />
+
+        <input
+          name="tags"
+          value={filters.tags || ''}
+          onChange={handleFilterChange}
+          placeholder={t("advancedSearch.articleTags")}
+        />
+
+        <input
+          name="genres"
+          value={filters.genres || ''}
+          onChange={handleFilterChange}
+          placeholder={t("advancedSearch.gameGenres")}
+        />
+
+        <input
+          name="platforms"
+          value={filters.platforms || ''}
+          onChange={handleFilterChange}
+          placeholder={t("advancedSearch.platforms")}
+        />
+
+        <input
+          name="dates"
+          value={filters.dates || ''}
+          onChange={handleFilterChange}
+          placeholder={t("advancedSearch.year")}
+        />
+
         <select name="ordering" value={filters.ordering || ''} onChange={handleFilterChange}>
-          <option value="">Sort (games)</option>
-          <option value="-rating">Rating</option>
-          <option value="released">Release date</option>
+          <option value="">{t("advancedSearch.sort")}</option>
+          <option value="-rating">{t("advancedSearch.sortRating")}</option>
+          <option value="released">{t("advancedSearch.sortRelease")}</option>
         </select>
+
         <button type="submit" className="btn-primary">
-          Search
+          {t("advancedSearch.searchBtn")}
         </button>
       </form>
-      {loading && <p>Searching…</p>}
+
+      {loading && <p>{t("advancedSearch.searching")}</p>}
       {error && <p className="error">{error}</p>}
+
       {articles.length > 0 && (
         <section>
-          <h2>Articles</h2>
+          <h2>{t("advancedSearch.articlesHeader")}</h2>
           <div className="article-grid">
             {articles.map((article) => (
               <ArticleCard key={article._id} article={article} />
@@ -79,9 +117,10 @@ export default function AdvancedSearchPage() {
           </div>
         </section>
       )}
+
       {games.length > 0 && (
         <section>
-          <h2>Games</h2>
+          <h2>{t("advancedSearch.gamesHeader")}</h2>
           <div className="game-grid">
             {games.map((game) => (
               <GameCard key={game.id} game={game} />

@@ -1,5 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
-import dayjs from 'dayjs';
+import { useEffect, useState } from 'react';
 import {
   createAdminArticle,
   deleteAdminArticle,
@@ -28,20 +27,6 @@ export default function AdminArticlesPage() {
   const [listLoading, setListLoading] = useState(true);
   const [editingId, setEditingId] = useState(null);
   const { t, language } = useLanguage();
-
-  const tableLabels = useMemo(
-    () => ({
-      title: t('admin.articles.table.title'),
-      tags: t('admin.articles.table.tags'),
-      published: t('admin.articles.table.published'),
-      actions: t('admin.articles.table.actions'),
-      edit: t('admin.articles.table.edit'),
-      delete: t('admin.articles.table.delete'),
-      noTags: t('admin.articles.table.noTags'),
-      unpublished: t('admin.articles.table.unpublished')
-    }),
-    [language, t]
-  );
 
   const isEditing = Boolean(editingId);
 
@@ -101,6 +86,8 @@ export default function AdminArticlesPage() {
       } else {
         setError(responseData?.error || t(translationKey));
       }
+
+      setError(err.response?.data?.error || t('admin.articles.errors.create'));
     } finally {
       setSaving(false);
     }
@@ -157,6 +144,8 @@ export default function AdminArticlesPage() {
           <p className="admin-card-subtitle">
             {isEditing ? t('admin.articles.editSubtitle') : t('admin.articles.formSubtitle')}
           </p>
+          <h2>{t('admin.articles.formTitle')}</h2>
+          <p className="admin-card-subtitle">{t('admin.articles.formSubtitle')}</p>
         </div>
         <form className="admin-form" onSubmit={handleSubmit}>
           <input
@@ -193,6 +182,8 @@ export default function AdminArticlesPage() {
             rows={6}
             required
           />
+
+          
           <textarea
             name="contentVi"
             value={form.contentVi}
@@ -230,6 +221,7 @@ export default function AdminArticlesPage() {
                 : t(isEditing ? 'admin.articles.form.update' : 'admin.articles.form.submit')}
             </button>
           </div>
+          
         </form>
       </section>
 
@@ -246,10 +238,10 @@ export default function AdminArticlesPage() {
             <table className="admin-table">
               <thead>
                 <tr>
-                  <th>{tableLabels.title}</th>
-                  <th>{tableLabels.tags}</th>
-                  <th>{tableLabels.published}</th>
-                  <th>{tableLabels.actions}</th>
+                  <th>{t('admin.articles.table.title')}</th>
+                  <th>{t('admin.articles.table.tags')}</th>
+                  <th>{t('admin.articles.table.published')}</th>
+                  <th>{t('admin.articles.table.actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -258,29 +250,34 @@ export default function AdminArticlesPage() {
                     language === 'vi'
                       ? article.titleVi || article.title
                       : article.title || article.titleVi;
-                  const publishedLabel =
-                    article.publishedAt && dayjs(article.publishedAt).isValid()
-                      ? dayjs(article.publishedAt).format(language === 'vi' ? 'DD/MM/YYYY' : 'MM/DD/YYYY')
-                      : tableLabels.unpublished;
-                  const tags = (article.tags || []).filter(Boolean);
                   return (
                     <tr key={article._id}>
                       <td>{displayTitle}</td>
-                      <td>{tags.length > 0 ? tags.join(', ') : tableLabels.noTags}</td>
-                      <td>{publishedLabel}</td>
+                      <td>{(article.tags || []).join(', ')}</td>
+                      <td>{article.publishedAt ? new Date(article.publishedAt).toLocaleDateString() : '—'}</td>
                       <td>
-                        <div className="admin-table-actions">
-                          <button type="button" onClick={() => handleEdit(article)} className="btn-link">
-                            {tableLabels.edit}
-                          </button>
-                          <button type="button" onClick={() => handleDelete(article._id)} className="btn-link">
-                            {tableLabels.delete}
-                          </button>
-                        </div>
+                        <button type="button" onClick={() => handleEdit(article)} className="btn-link">
+                          {t('admin.articles.table.edit')}
+                        </button>
+                        <button type="button" onClick={() => handleDelete(article._id)} className="btn-link">
+                          {t('admin.articles.table.delete')}
+                        </button>
                       </td>
                     </tr>
                   );
                 })}
+                {articles.map((article) => (
+                  <tr key={article._id}>
+                    <td>{article.title}</td>
+                    <td>{(article.tags || []).join(', ')}</td>
+                    <td>{article.publishedAt ? new Date(article.publishedAt).toLocaleDateString() : '—'}</td>
+                    <td>
+                      <button type="button" onClick={() => handleDelete(article._id)} className="btn-link">
+                        {t('admin.articles.table.delete')}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

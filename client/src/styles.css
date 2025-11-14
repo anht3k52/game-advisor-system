@@ -551,7 +551,7 @@ a:hover {
 .admin-form input,
 .admin-form select,
 .admin-form textarea {
-  flex: 1 1 200px;
+  flex: 1;
 }
 
 .pagination {
@@ -766,12 +766,6 @@ a:hover {
   border-bottom: 1px solid rgba(148, 163, 184, 0.15);
   padding: 0.75rem 1rem;
   text-align: left;
-}
-
-.admin-table-actions {
-  display: inline-flex;
-  gap: 0.75rem;
-  align-items: center;
 }
 
 .dashboard-cards {

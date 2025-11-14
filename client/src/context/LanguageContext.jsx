@@ -173,15 +173,17 @@ const translations = {
           submitting: 'Creating…',
           update: 'Save changes',
           updating: 'Saving…',
-          cancelEdit: 'Cancel edit'
+          cancelEdit: 'Cancel edit',
+          submitting: 'Creating…'
         },
+         
         errors: {
           load: 'Unable to load articles',
           create: 'Unable to create article',
           update: 'Unable to update article',
           delete: 'Unable to delete article',
-          slugConflict: 'An article with that address already exists. Please adjust the title or slug.'
-        },
+          slugConflict: 'An article with that address already exists. Please adjust the title or slug.',
+          delete: 'Unable to delete article',
         confirmDelete: 'Delete this article?',
         table: {
           title: 'Title',
@@ -189,9 +191,7 @@ const translations = {
           published: 'Published',
           actions: 'Actions',
           edit: 'Edit',
-          delete: 'Delete',
-          noTags: 'No tags',
-          unpublished: '—'
+          delete: 'Delete'
         },
         empty: 'No articles yet. Start by creating a new post.'
       },
@@ -421,14 +421,16 @@ const translations = {
           submitting: 'Đang tạo…',
           update: 'Lưu thay đổi',
           updating: 'Đang lưu…',
-          cancelEdit: 'Hủy chỉnh sửa'
+          cancelEdit: 'Hủy chỉnh sửa',
+          submitting: 'Đang tạo…'
         },
         errors: {
           load: 'Không thể tải danh sách bài viết',
           create: 'Không thể tạo bài viết',
           update: 'Không thể cập nhật bài viết',
           delete: 'Không thể xóa bài viết',
-          slugConflict: 'Đã có bài viết sử dụng địa chỉ này. Vui lòng chỉnh lại tiêu đề hoặc slug.'
+          slugConflict: 'Đã có bài viết sử dụng địa chỉ này. Vui lòng chỉnh lại tiêu đề hoặc slug.',
+          delete: 'Không thể xóa bài viết'
         },
         confirmDelete: 'Bạn có chắc muốn xóa bài viết này?',
         table: {
@@ -437,9 +439,7 @@ const translations = {
           published: 'Ngày đăng',
           actions: 'Thao tác',
           edit: 'Chỉnh sửa',
-          delete: 'Xóa',
-          noTags: 'Không có thẻ',
-          unpublished: '—'
+          delete: 'Xóa'
         },
         empty: 'Chưa có bài viết nào. Hãy bắt đầu tạo bài mới.'
       },
@@ -502,8 +502,8 @@ const translations = {
       loading: 'Đang tải…'
     }
   }
+}
 };
-
 function getTranslation(language, key) {
   const segments = key.split('.');
   let current = translations[language] || translations.en;
