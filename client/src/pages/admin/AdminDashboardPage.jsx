@@ -1,87 +1,123 @@
 import { useEffect, useState } from 'react';
 import { fetchDashboard } from '../../services/adminApi.js';
+import { useLanguage } from '../../context/LanguageContext.jsx';
 
 export default function AdminDashboardPage() {
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
+  const { t } = useLanguage();
 
   useEffect(() => {
-    async function load() {
-      try {
-        const result = await fetchDashboard();
-        setData(result);
-      } catch (err) {
-        console.error(err);
-        setError('Unable to load dashboard data');
-      }
-    }
-
     load();
   }, []);
 
-  if (error) {
-    return (
-      <div className="admin-page">
-        <p className="error">{error}</p>
-      </div>
-    );
+  async function load() {
+    try {
+      setLoading(true);
+      setError('');
+      const result = await fetchDashboard();
+      setData(result);
+    } catch (err) {
+      console.error(err);
+      setError(t('admin.dashboard.error'));
+    } finally {
+      setLoading(false);
+    }
   }
 
-  if (!data) {
-    return (
-      <div className="admin-page">
-        <p>Loading dashboard…</p>
-      </div>
-    );
-  }
-
-  const { stats, recentArticles, recentComments } = data;
+  const stats = data?.stats ?? {};
+  const topGames = stats.topGames?.favorites || [];
+  const recentArticles = data?.recentArticles || [];
+  const recentComments = data?.recentComments || [];
 
   return (
     <div className="admin-page">
-      <section className="dashboard-cards">
-        <div className="card">
-          <h3>Users</h3>
-          <p>{stats.userCount}</p>
+      <header className="admin-page-header">
+        <div>
+          <h1>{t('admin.dashboard.title')}</h1>
+          <p>{t('admin.dashboard.subtitle')}</p>
         </div>
-        <div className="card">
-          <h3>Articles</h3>
-          <p>{stats.articleCount}</p>
-        </div>
-        <div className="card">
-          <h3>Comments</h3>
-          <p>{stats.commentCount}</p>
-        </div>
-      </section>
+        <button type="button" className="btn-secondary" onClick={load} disabled={loading}>
+          {t('admin.actions.refresh')}
+        </button>
+      </header>
+      {error && <p className="error">{error}</p>}
+      {loading ? (
+        <section className="admin-card">
+          <p>{t('common.loading')}</p>
+        </section>
+      ) : (
+        <>
+          <section className="admin-card stats-card">
+            <div className="dashboard-cards">
+              <div className="card">
+                <h3>{t('admin.dashboard.stats.users')}</h3>
+                <p>{stats.userCount}</p>
+              </div>
+              <div className="card">
+                <h3>{t('admin.dashboard.stats.articles')}</h3>
+                <p>{stats.articleCount}</p>
+              </div>
+              <div className="card">
+                <h3>{t('admin.dashboard.stats.comments')}</h3>
+                <p>{stats.commentCount}</p>
+              </div>
+            </div>
+          </section>
 
-      <section>
-        <h2>Top games by favourites</h2>
-        <ul>
-          {(stats.topGames?.favorites || []).map((item) => (
-            <li key={item._id}>{item._id} – {item.count} favourites</li>
-          ))}
-        </ul>
-      </section>
+          <section className="admin-card">
+            <div className="admin-card-header">
+              <h2>{t('admin.dashboard.topGamesTitle')}</h2>
+            </div>
+            {topGames.length === 0 ? (
+              <p className="admin-empty">{t('admin.dashboard.topGamesEmpty')}</p>
+            ) : (
+              <ul className="admin-list">
+                {topGames.map((item) => (
+                  <li key={item._id}>
+                    <span>{item._id}</span>
+                    <span>{t('admin.dashboard.topGamesCount', { count: item.count })}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
 
-      <section>
-        <h2>Recent articles</h2>
-        <ul>
-          {recentArticles.map((article) => (
-            <li key={article._id}>{article.title}</li>
-          ))}
-        </ul>
-      </section>
+          <section className="admin-card">
+            <div className="admin-card-header">
+              <h2>{t('admin.dashboard.recentArticlesTitle')}</h2>
+            </div>
+            {recentArticles.length === 0 ? (
+              <p className="admin-empty">{t('admin.dashboard.recentArticlesEmpty')}</p>
+            ) : (
+              <ul className="admin-list">
+                {recentArticles.map((article) => (
+                  <li key={article._id}>{article.title}</li>
+                ))}
+              </ul>
+            )}
+          </section>
 
-      <section>
-        <h2>Latest comments</h2>
-        <ul>
-          {recentComments.map((comment) => (
-            <li key={comment._id}>
-              <strong>{comment.user?.fullName}</strong>: {comment.content}
-            </li>
-          ))}
-        </ul>
-      </section>
+          <section className="admin-card">
+            <div className="admin-card-header">
+              <h2>{t('admin.dashboard.recentCommentsTitle')}</h2>
+            </div>
+            {recentComments.length === 0 ? (
+              <p className="admin-empty">{t('admin.dashboard.recentCommentsEmpty')}</p>
+            ) : (
+              <ul className="admin-list">
+                {recentComments.map((comment) => (
+                  <li key={comment._id}>
+                    <strong>{comment.user?.fullName}</strong>
+                    <span>{comment.content}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        </>
+      )}
     </div>
   );
 }
