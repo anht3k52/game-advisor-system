@@ -9,14 +9,30 @@ export async function register(req, res, next) {
   }
 
   try {
-    const { fullName, email, password, avatar } = req.body;
+    const { fullName, email, password, avatar, username } = req.body;
 
-    const existing = await User.findOne({ email });
+    const normalizedEmail = email.toLowerCase();
+    const normalizedUsername = username ? username.trim().toLowerCase() : undefined;
+
+    if (normalizedUsername) {
+      const usernameTaken = await User.findOne({ username: normalizedUsername });
+      if (usernameTaken) {
+        return res.status(409).json({ error: 'Username already taken' });
+      }
+    }
+
+    const existing = await User.findOne({ email: normalizedEmail });
     if (existing) {
       return res.status(409).json({ error: 'Email already registered' });
     }
 
-    const user = await User.create({ fullName, email, password, avatar });
+    const user = await User.create({
+      fullName,
+      email: normalizedEmail,
+      password,
+      avatar,
+      ...(normalizedUsername ? { username: normalizedUsername } : {})
+    });
     const token = generateToken(user);
 
     res.status(201).json({
@@ -35,8 +51,14 @@ export async function login(req, res, next) {
   }
 
   try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    const { identifier, password } = req.body;
+    const normalizedIdentifier = identifier.trim().toLowerCase();
+
+    const query = normalizedIdentifier.includes('@')
+      ? { email: normalizedIdentifier }
+      : { username: normalizedIdentifier };
+
+    const user = await User.findOne(query);
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }

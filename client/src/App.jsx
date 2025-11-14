@@ -14,10 +14,12 @@ import AdminArticlesPage from './pages/admin/AdminArticlesPage.jsx';
 import AdminCommentsPage from './pages/admin/AdminCommentsPage.jsx';
 import { useAuth } from './context/AuthContext.jsx';
 import RecommendationsSection from './components/RecommendationsSection.jsx';
+import { useLanguage } from './context/LanguageContext.jsx';
 
 function Layout() {
   const { user, logout } = useAuth();
   const location = useLocation();
+  const { t, language, setLanguage, availableLanguages } = useLanguage();
 
   return (
     <div className="app-shell">
@@ -27,26 +29,50 @@ function Layout() {
             Game Advisor
           </Link>
           <div className="nav-links">
-            <Link to="/games">Games</Link>
-            <Link to="/search">Advanced Search</Link>
-            <Link to="/compare">Compare</Link>
-            {user && user.role === 'admin' && <Link to="/admin">Admin</Link>}
+            <Link to="/games">{t('nav.games')}</Link>
+            <Link to="/search">{t('nav.search')}</Link>
+            <Link to="/compare">{t('nav.compare')}</Link>
+            {user && user.role === 'admin' && (
+              <Link to="/admin" className="nav-admin-link">
+                {t('nav.admin')}
+              </Link>
+            )}
+          </div>
+          <div className="nav-language">
+            <label htmlFor="language-select" className="sr-only">
+              {t('nav.language')}
+            </label>
+            <select
+              id="language-select"
+              value={language}
+              onChange={(event) => setLanguage(event.target.value)}
+            >
+              {availableLanguages.map((option) => (
+                <option key={option.code} value={option.code}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
           </div>
           <div className="nav-auth">
             {user ? (
               <>
                 <Link to="/profile" className="avatar">
-                  {user.avatar ? <img src={user.avatar} alt={user.fullName} /> : user.fullName?.[0] || user.email?.[0] || "U"}
+                  {user.avatar ? (
+                    <img src={user.avatar} alt={user.fullName || user.username || user.email} />
+                  ) : (
+                    user.fullName?.[0] || user.username?.[0] || user.email?.[0] || 'U'
+                  )}
                 </Link>
                 <button type="button" onClick={logout} className="btn-link">
-                  Logout
+                  {t('nav.logout')}
                 </button>
               </>
             ) : (
               <>
-                <Link to="/login">Login</Link>
+                <Link to="/login">{t('nav.login')}</Link>
                 <Link to="/register" className="btn-primary">
-                  Register
+                  {t('nav.register')}
                 </Link>
               </>
             )}

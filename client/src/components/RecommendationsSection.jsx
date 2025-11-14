@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { fetchRecommendations } from '../services/recommendationApi.js';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 export default function RecommendationsSection() {
   const { user } = useAuth();
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const { t } = useLanguage();
 
   useEffect(() => {
     async function load() {
@@ -18,20 +20,20 @@ export default function RecommendationsSection() {
         setGames(data.results || []);
       } catch (err) {
         console.error(err);
-        setError('Unable to load recommendations');
+        setError(t('recommendations.error'));
       } finally {
         setLoading(false);
       }
     }
 
     load();
-  }, [user?._id]);
+  }, [user?._id, t]);
 
   if (loading) {
     return (
       <section className="recommendations">
-        <h3>Recommendations</h3>
-        <p>Loading suggestions…</p>
+        <h3>{t('recommendations.title')}</h3>
+        <p>{t('recommendations.loading')}</p>
       </section>
     );
   }
@@ -39,7 +41,7 @@ export default function RecommendationsSection() {
   if (error) {
     return (
       <section className="recommendations">
-        <h3>Recommendations</h3>
+        <h3>{t('recommendations.title')}</h3>
         <p>{error}</p>
       </section>
     );
@@ -47,8 +49,8 @@ export default function RecommendationsSection() {
 
   return (
     <section className="recommendations">
-      <h3>Recommendations</h3>
-      {games.length === 0 && <p>No suggestions yet. Add games to your favourites!</p>}
+      <h3>{t('recommendations.title')}</h3>
+      {games.length === 0 && <p>{t('recommendations.empty')}</p>}
       <ul>
         {games.slice(0, 6).map((game) => (
           <li key={game.id}>

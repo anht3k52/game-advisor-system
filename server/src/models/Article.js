@@ -7,6 +7,10 @@ const articleSchema = new mongoose.Schema(
       required: true,
       trim: true
     },
+    titleVi: {
+      type: String,
+      trim: true
+    },
     slug: {
       type: String,
       required: true,
@@ -18,10 +22,12 @@ const articleSchema = new mongoose.Schema(
       type: String,
       required: true
     },
+    shortDescriptionVi: String,
     content: {
       type: String,
       required: true
     },
+    contentVi: String,
     relatedGameId: String,
     author: {
       type: mongoose.Schema.Types.ObjectId,

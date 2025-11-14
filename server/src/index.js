@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 
 import app from './app.js';
 import { connectDB } from './config/database.js';
+import bootstrapData from './utils/bootstrapData.js';
 
 dotenv.config();
 
@@ -12,6 +13,7 @@ const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/game-a
 async function bootstrap() {
   try {
     await connectDB(MONGODB_URI);
+    await bootstrapData();
 
     app.listen(PORT, () => {
       console.log(`Game Advisor API listening on port ${PORT}`);
