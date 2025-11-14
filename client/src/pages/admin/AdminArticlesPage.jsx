@@ -86,6 +86,8 @@ export default function AdminArticlesPage() {
       } else {
         setError(responseData?.error || t(translationKey));
       }
+
+      setError(err.response?.data?.error || t('admin.articles.errors.create'));
     } finally {
       setSaving(false);
     }
@@ -142,6 +144,8 @@ export default function AdminArticlesPage() {
           <p className="admin-card-subtitle">
             {isEditing ? t('admin.articles.editSubtitle') : t('admin.articles.formSubtitle')}
           </p>
+          <h2>{t('admin.articles.formTitle')}</h2>
+          <p className="admin-card-subtitle">{t('admin.articles.formSubtitle')}</p>
         </div>
         <form className="admin-form" onSubmit={handleSubmit}>
           <input
@@ -178,6 +182,8 @@ export default function AdminArticlesPage() {
             rows={6}
             required
           />
+
+          
           <textarea
             name="contentVi"
             value={form.contentVi}
@@ -215,6 +221,9 @@ export default function AdminArticlesPage() {
                 : t(isEditing ? 'admin.articles.form.update' : 'admin.articles.form.submit')}
             </button>
           </div>
+          <button type="submit" className="btn-primary" disabled={saving}>
+            {saving ? t('admin.articles.form.submitting') : t('admin.articles.form.submit')}
+          </button>
         </form>
       </section>
 
@@ -259,6 +268,18 @@ export default function AdminArticlesPage() {
                     </tr>
                   );
                 })}
+                {articles.map((article) => (
+                  <tr key={article._id}>
+                    <td>{article.title}</td>
+                    <td>{(article.tags || []).join(', ')}</td>
+                    <td>{article.publishedAt ? new Date(article.publishedAt).toLocaleDateString() : '—'}</td>
+                    <td>
+                      <button type="button" onClick={() => handleDelete(article._id)} className="btn-link">
+                        {t('admin.articles.table.delete')}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

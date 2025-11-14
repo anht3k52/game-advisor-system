@@ -4,7 +4,7 @@ import Article from '../models/Article.js';
 
 const ADMIN_USERNAME = 'admin';
 const ADMIN_EMAIL = 'admin@example.com';
-const ADMIN_PASSWORD = 'admin';
+const ADMIN_PASSWORD = 'admin123';
 const ADMIN_FULL_NAME = 'Administrator';
 
 const defaultArticles = [

@@ -52,9 +52,17 @@ const articleSchema = new mongoose.Schema(
   }
 );
 
-articleSchema.index({ title: 'text', shortDescription: 'text', content: 'text', tags: 1 });
+// 👉 Text index KHÔNG chứa tags
+articleSchema.index({
+  title: 'text',
+  shortDescription: 'text',
+  content: 'text'
+});
 
-articleSchema.pre('save', function setUpdated(next) {
+// 👉 Tạo index bình thường cho tags (không bắt buộc)
+articleSchema.index({ tags: 1 });
+
+articleSchema.pre('save', function (next) {
   this.updatedAt = new Date();
   next();
 });

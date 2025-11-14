@@ -427,6 +427,7 @@ const translations = {
           update: 'Không thể cập nhật bài viết',
           delete: 'Không thể xóa bài viết',
           slugConflict: 'Đã có bài viết sử dụng địa chỉ này. Vui lòng chỉnh lại tiêu đề hoặc slug.'
+          delete: 'Không thể xóa bài viết'
         },
         confirmDelete: 'Bạn có chắc muốn xóa bài viết này?',
         table: {
