@@ -458,7 +458,7 @@ a:hover {
 .admin-form input,
 .admin-form select,
 .admin-form textarea {
-  flex: 1 1 200px;
+  flex: 1;
 }
 
 .pagination {
