@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { v4 as uuid } from 'uuid'
 import store from '../data/store.js'
+import { fetchRawgGames } from '../services/rawgService.js'
 
 const router = Router()
 
@@ -57,6 +58,16 @@ router.delete('/:id', (req, res) => {
 
   store.games.splice(index, 1)
   res.status(204).send()
+})
+
+router.get('/external/trending', async (req, res) => {
+  try {
+    const { page = 1, pageSize, search } = req.query
+    const results = await fetchRawgGames({ page, pageSize, search })
+    res.json(results)
+  } catch (error) {
+    res.status(502).json({ error: error.message || 'Không thể lấy dữ liệu từ RAWG' })
+  }
 })
 
 export default router

@@ -34,6 +34,11 @@ npm --prefix client run dev
 
 Client sử dụng proxy `/api` tới `http://localhost:4000`. Có thể cấu hình lại URL API thông qua biến môi trường `VITE_API_URL`.
 
+### Cấu hình môi trường
+
+- `RAWG_API_KEY`: bắt buộc khi muốn lấy dữ liệu game thực tế từ [RAWG](https://rawg.io/apidocs) thông qua endpoint `/api/games/external/trending`.
+- `VITE_USE_MOCK`: đặt thành `true` để frontend dùng dữ liệu giả lập (`client/src/mockData.js`) giúp demo UI mà không cần khởi chạy server.
+
 ## Lưu ý
 
 - Dữ liệu được lưu trong bộ nhớ (in-memory) để đơn giản hoá demo. Có thể thay thế bằng cơ sở dữ liệu thực tế.
