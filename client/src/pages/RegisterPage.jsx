@@ -36,33 +36,35 @@ export default function RegisterPage() {
 
   return (
     <div className="page auth-page">
-      <h1>{t('auth.registerTitle')}</h1>
-      <form onSubmit={handleSubmit} className="auth-form">
-        <label>
-          {t('auth.fullName')}
-          <input name="fullName" value={form.fullName} onChange={handleChange} required />
-        </label>
-        <label>
-          {t('auth.email')}
-          <input type="email" name="email" value={form.email} onChange={handleChange} required />
-        </label>
-        <label>
-          {t('auth.usernameOptional')}
-          <input name="username" value={form.username} onChange={handleChange} />
-        </label>
-        <label>
-          {t('auth.passwordField')}
-          <input type="password" name="password" value={form.password} onChange={handleChange} required />
-        </label>
-        <label>
-          {t('auth.avatarUrl')}
-          <input name="avatar" value={form.avatar} onChange={handleChange} />
-        </label>
-        {error && <p className="error">{error}</p>}
-        <button type="submit" className="btn-primary" disabled={loading}>
-          {loading ? t('auth.registering') : t('auth.register')}
-        </button>
-      </form>
+      <div className="auth-card">
+        <h1>{t('auth.registerTitle')}</h1>
+        <form onSubmit={handleSubmit} className="auth-form">
+          <label>
+            {t('auth.fullName')}
+            <input name="fullName" value={form.fullName} onChange={handleChange} required />
+          </label>
+          <label>
+            {t('auth.email')}
+            <input type="email" name="email" value={form.email} onChange={handleChange} required />
+          </label>
+          <label>
+            {t('auth.usernameOptional')}
+            <input name="username" value={form.username} onChange={handleChange} />
+          </label>
+          <label>
+            {t('auth.passwordField')}
+            <input type="password" name="password" value={form.password} onChange={handleChange} required />
+          </label>
+          <label>
+            {t('auth.avatarUrl')}
+            <input name="avatar" value={form.avatar} onChange={handleChange} />
+          </label>
+          {error && <p className="error">{error}</p>}
+          <button type="submit" className="btn-primary" disabled={loading}>
+            {loading ? t('auth.registering') : t('auth.register')}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
