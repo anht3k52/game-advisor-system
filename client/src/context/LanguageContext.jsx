@@ -166,7 +166,7 @@ function interpolate(value, replacements) {
 }
 
 export function LanguageProvider({ children }) {
-  const [language, setLanguage] = useState(() => localStorage.getItem(STORAGE_KEY) || 'en');
+  const [language, setLanguage] = useState(() => localStorage.getItem(STORAGE_KEY) || 'vi');
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, language);
