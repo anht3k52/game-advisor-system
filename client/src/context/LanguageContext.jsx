@@ -174,7 +174,8 @@ const translations = {
           update: 'Save changes',
           updating: 'Saving…',
           cancelEdit: 'Cancel edit',
-          submitting: 'Creating…',
+          submitting: 'Creating…'
+        },
          
         errors: {
           load: 'Unable to load articles',
@@ -501,8 +502,8 @@ const translations = {
       loading: 'Đang tải…'
     }
   }
+}
 };
-
 function getTranslation(language, key) {
   const segments = key.split('.');
   let current = translations[language] || translations.en;
